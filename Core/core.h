@@ -1,4 +1,5 @@
 #pragma once
+#include "alu_src.h"
 #include "control_logic.h"
 #include "immediate_decode.h"
 #include "mem_align.h"
@@ -22,6 +23,7 @@ namespace RISCV
 		CoreComp::ImmediateDecode<32> imm_decode;
 		CoreComp::ControlUnit<32> control_unit;
 		CoreComp::MemAlign<32> mem_align;
+		CoreComp::ALUSource<32> alu_src_a;
 
 		/*CoreUtils::InputPin<1> clock;
 		CoreUtils::InputPin<1> reset;

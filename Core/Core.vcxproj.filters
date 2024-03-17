@@ -53,5 +53,8 @@
     <ClInclude Include="mem_align.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="alu_src.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -132,6 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\multifunction\multicast.hpp" />
+    <ClInclude Include="alu_src.h" />
     <ClInclude Include="bitset_arithmetic.h" />
     <ClInclude Include="control_logic.h" />
     <ClInclude Include="core.h" />
