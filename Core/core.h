@@ -1,6 +1,7 @@
 #pragma once
 #include "control_logic.h"
 #include "immediate_decode.h"
+#include "mem_align.h"
 #include "pipeline_registers.h"
 #include "program_counter.h"
 #include "registers.h"
@@ -20,6 +21,7 @@ namespace RISCV
 		CoreComp::Registers<32, 5> registers;
 		CoreComp::ImmediateDecode<32> imm_decode;
 		CoreComp::ControlUnit<32> control_unit;
+		CoreComp::MemAlign<32> mem_align;
 
 		/*CoreUtils::InputPin<1> clock;
 		CoreUtils::InputPin<1> reset;

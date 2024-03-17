@@ -136,6 +136,7 @@
     <ClInclude Include="control_logic.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="immediate_decode.h" />
+    <ClInclude Include="mem_align.h" />
     <ClInclude Include="pipeline_registers.h" />
     <ClInclude Include="program_counter.h" />
     <ClInclude Include="registers.h" />
