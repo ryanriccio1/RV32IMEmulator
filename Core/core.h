@@ -1,9 +1,9 @@
 #pragma once
+#include "control_logic.h"
 #include "immediate_decode.h"
 #include "pipeline_registers.h"
 #include "program_counter.h"
 #include "registers.h"
-#include "utils.h"
 
 namespace RISCV
 {
@@ -19,6 +19,7 @@ namespace RISCV
 		CoreComp::MEM_WB<32> mem_wb;
 		CoreComp::Registers<32, 5> registers;
 		CoreComp::ImmediateDecode<32> imm_decode;
+		CoreComp::ControlUnit<32> control_unit;
 
 		/*CoreUtils::InputPin<1> clock;
 		CoreUtils::InputPin<1> reset;

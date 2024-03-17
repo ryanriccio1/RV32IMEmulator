@@ -76,7 +76,7 @@ namespace RISCV
 			SignExtend();
 			InputPin<bit_width_in> data_in;
 			OutputPin<bit_width_out> data_out;
-			bitset<bit_width_out> calc_sign_extend(bitset<bit_width_in> data_in);
+			static bitset<bit_width_out> calc_sign_extend(bitset<bit_width_in> new_data);
 		};
 
 		template <size_t bit_width_in, size_t bit_width_out>
@@ -86,7 +86,7 @@ namespace RISCV
 			ZeroExtend();
 			InputPin<bit_width_in> data_in;
 			OutputPin<bit_width_out> data_out;
-			bitset<bit_width_out> calc_zero_extend(bitset<bit_width_in> data_in);
+			static bitset<bit_width_out> calc_zero_extend(bitset<bit_width_in> new_data);
 		};
 
 		template <size_t bit_width>
