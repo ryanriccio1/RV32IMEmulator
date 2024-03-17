@@ -69,6 +69,26 @@ namespace RISCV
 			OutputPin<ending_bit - starting_bit + 1> data_out;
 		};
 
+		template <size_t bit_width_in, size_t bit_width_out>
+		class SignExtend
+		{
+		public:
+			SignExtend();
+			InputPin<bit_width_in> data_in;
+			OutputPin<bit_width_out> data_out;
+			bitset<bit_width_out> calc_sign_extend(bitset<bit_width_in> data_in);
+		};
+
+		template <size_t bit_width_in, size_t bit_width_out>
+		class ZeroExtend
+		{
+		public:
+			ZeroExtend();
+			InputPin<bit_width_in> data_in;
+			OutputPin<bit_width_out> data_out;
+			bitset<bit_width_out> calc_zero_extend(bitset<bit_width_in> data_in);
+		};
+
 		template <size_t bit_width>
 		Pin<bit_width>::Pin() : data(0) {}
 
@@ -147,6 +167,42 @@ namespace RISCV
 					bitmask <<= starting_bit;
 					this->data_out.set_data(((new_data & bitmask) >> starting_bit).to_ullong());
 				};
+		}
+
+		template <size_t bit_width_in, size_t bit_width_out>
+		SignExtend<bit_width_in, bit_width_out>::SignExtend()
+		{
+			data_in.on_state_change = [this](bitset<bit_width_in> new_data)
+			{
+				data_out.set_data(calc_sign_extend(new_data));
+			};
+		}
+
+		template <size_t bit_width_in, size_t bit_width_out>
+		bitset<bit_width_out> SignExtend<bit_width_in, bit_width_out>::calc_sign_extend(bitset<bit_width_in> new_data)
+		{
+			uint64_t data = new_data.to_ullong();
+			if (new_data[bit_width_in - 1] == 1)
+			{
+				const uint64_t bitmask = ((1 << (64 - bit_width_out)) - 1) << bit_width_in;
+				data |= bitmask;
+			}
+			return data;
+		}
+
+		template <size_t bit_width_in, size_t bit_width_out>
+		ZeroExtend<bit_width_in, bit_width_out>::ZeroExtend()
+		{
+			data_in.on_state_change = [this](bitset<bit_width_in> new_data)
+			{
+				data_out.set_data(calc_zero_extend(new_data));
+			};
+		}
+
+		template <size_t bit_width_in, size_t bit_width_out>
+		bitset<bit_width_out> ZeroExtend<bit_width_in, bit_width_out>::calc_zero_extend(bitset<bit_width_in> new_data)
+		{
+			return new_data.to_ullong();
 		}
 
 		/*template <size_t bit_width>

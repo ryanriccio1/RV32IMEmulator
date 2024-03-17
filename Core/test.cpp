@@ -5,5 +5,4 @@
 int main()
 {
 	auto core = new RISCV::Core();
-
 }

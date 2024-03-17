@@ -1,4 +1,5 @@
 #pragma once
+#include "immediate_decode.h"
 #include "pipeline_registers.h"
 #include "program_counter.h"
 #include "registers.h"
@@ -17,6 +18,7 @@ namespace RISCV
 		CoreComp::EX_MEM<32> ex_mem;
 		CoreComp::MEM_WB<32> mem_wb;
 		CoreComp::Registers<32, 5> registers;
+		CoreComp::ImmediateDecode<32> imm_decode;
 
 		/*CoreUtils::InputPin<1> clock;
 		CoreUtils::InputPin<1> reset;
