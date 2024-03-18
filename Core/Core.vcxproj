@@ -139,6 +139,7 @@
     <ClInclude Include="forward_control.h" />
     <ClInclude Include="hazard_control.h" />
     <ClInclude Include="immediate_decode.h" />
+    <ClInclude Include="irq.h" />
     <ClInclude Include="mem_align.h" />
     <ClInclude Include="pipeline_registers.h" />
     <ClInclude Include="program_counter.h" />

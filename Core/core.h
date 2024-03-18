@@ -6,6 +6,7 @@
 #include "forward_control.h"
 #include "hazard_control.h"
 #include "immediate_decode.h"
+#include "irq.h"
 #include "mem_align.h"
 #include "pipeline_registers.h"
 #include "program_counter.h"
@@ -32,6 +33,7 @@ namespace RISCV
 		CoreComp::HazardControl hazard;
 		CoreComp::ForwardControl<32> forward_control;
 		CoreComp::ALU<32> alu;
+		CoreComp::IRQControl<32> irq_control;
 
 		/*CoreUtils::InputPin<1> clock;
 		CoreUtils::InputPin<1> reset;

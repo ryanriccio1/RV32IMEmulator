@@ -111,6 +111,21 @@ namespace RISCV
 			OutputPin<bit_width> data_out;
 		};
 
+		template <size_t bit_width, size_t max_value>
+		class Counter
+		{
+		public:
+			Counter();
+			Counter(bool stay_at_value);
+			InputPin<1> reset;
+			InputPin<1> clock;
+			InputPin<1> write_enable;
+
+			OutputPin<1> data_out;
+		private:
+			size_t count;
+		};
+
 		template <size_t bit_width>
 		Pin<bit_width>::Pin() : data(0) {}
 
@@ -250,6 +265,41 @@ namespace RISCV
 			b.on_state_change = [this](bitset<bit_width> new_data)
 			{
 				data_out.set_data(a.get_data() | b.get_data());
+			};
+		}
+
+		template <size_t bit_width, size_t max_value>
+		Counter<bit_width, max_value>::Counter() : Counter(true) {}
+
+		template <size_t bit_width, size_t max_value>
+		Counter<bit_width, max_value>::Counter(bool stay_at_value)
+		{
+			reset.on_state_change = [this](bitset<1> new_data)
+			{
+				if (new_data == 1)
+				{
+					count = 0;
+					data_out.set_data(0);
+				}
+			};
+			clock.on_state_change = [this, stay_at_value](bitset<1> new_data)
+			{
+				if (new_data == 1 && write_enable.get_data() == 1)
+				{
+					count++;
+					if (count == max_value)
+						data_out.set_data(1);
+					if (count > max_value)
+					{
+						if (stay_at_value)
+							count--;
+						else
+						{
+							count = 0;
+							data_out.set_data(0);
+						}
+					}
+				}
 			};
 		}
 
