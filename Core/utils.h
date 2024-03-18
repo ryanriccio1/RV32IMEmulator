@@ -205,29 +205,12 @@ namespace RISCV
 			return new_data.to_ullong();
 		}
 
-		/*template <size_t bit_width>
-		Register<bit_width>::Register() : write_enable(false), clock(false), rising_edge(true) {}
-
-		template <size_t bit_width>
-		Register<bit_width>::Register(bool rising_edge) : write_enable(false), clock(false), rising_edge(rising_edge) {}
-
-		template <size_t bit_width>
-		Register<bit_width>::Register(bool rising_edge, bool write_enable) : write_enable(write_enable), clock(false), rising_edge(rising_edge) {}
-
-		template <size_t bit_width>
-		bitset<bit_width> Register<bit_width>::get_data() {	return data; }
-
-		template <size_t bit_width>
-		void Register<bit_width>::set_data(bitset<bit_width> new_data) { data_input = new_data; }
-
-		template <size_t bit_width>
-		void Register<bit_width>::set_clock(bool clock_value)
-		{
-			if (!rising_edge)
-				clock_value = ~clock_value;
-			clock = clock_value;
-			if (write_enable && clock)
-				data = data_input;
-		}*/
+		template<size_t bit_width>
+		int64_t bitset_to_int(std::bitset<bit_width> bitSet) {
+			if (!bitSet[bit_width - 1]) return bitSet.to_ullong();
+			bitSet.flip();
+			const int64_t new_int = bitSet.to_ullong() + 1;
+			return -new_int;
+		}
 	}
 }

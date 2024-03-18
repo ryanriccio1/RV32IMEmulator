@@ -1,5 +1,6 @@
 #pragma once
 #include "alu_src.h"
+#include "branch.h"
 #include "control_logic.h"
 #include "immediate_decode.h"
 #include "mem_align.h"
@@ -24,6 +25,7 @@ namespace RISCV
 		CoreComp::ControlUnit<32> control_unit;
 		CoreComp::MemAlign<32> mem_align;
 		CoreComp::ALUSource<32> alu_src_a;
+		CoreComp::BranchLogic<32> branch;
 
 		/*CoreUtils::InputPin<1> clock;
 		CoreUtils::InputPin<1> reset;

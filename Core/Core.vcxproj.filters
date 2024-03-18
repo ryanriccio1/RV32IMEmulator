@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\multifunction">
-      <UniqueIdentifier>{4eac9656-1c11-4efb-846a-d1232bd2c50f}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test.cpp">
@@ -29,16 +26,10 @@
     <ClInclude Include="utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\multifunction\multicast.hpp">
-      <Filter>Header Files\multifunction</Filter>
-    </ClInclude>
     <ClInclude Include="program_counter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pipeline_registers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bitset_arithmetic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="registers.h">
@@ -54,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="alu_src.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="branch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
