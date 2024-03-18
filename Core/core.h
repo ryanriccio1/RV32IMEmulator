@@ -2,6 +2,7 @@
 #include "alu_src.h"
 #include "branch.h"
 #include "control_logic.h"
+#include "forward_control.h"
 #include "hazard_control.h"
 #include "immediate_decode.h"
 #include "mem_align.h"
@@ -28,6 +29,7 @@ namespace RISCV
 		CoreComp::ALUSource<32> alu_src_a;
 		CoreComp::BranchLogic<32> branch;
 		CoreComp::HazardControl hazard;
+		CoreComp::ForwardControl<32> forward_control;
 
 		/*CoreUtils::InputPin<1> clock;
 		CoreUtils::InputPin<1> reset;
