@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{d6ddf5be-1fd0-414b-b3c3-f06753a687f9}</ProjectGuid>
-    <RootNamespace>Core</RootNamespace>
+    <ProjectGuid>{2db6bb60-29ec-49b8-a8ef-91e3053981ca}</ProjectGuid>
+    <RootNamespace>Computer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -104,7 +104,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../multifunction;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -132,20 +131,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="alu.h" />
-    <ClInclude Include="alu_src.h" />
-    <ClInclude Include="branch.h" />
-    <ClInclude Include="control_logic.h" />
-    <ClInclude Include="core.h" />
-    <ClInclude Include="forward_control.h" />
-    <ClInclude Include="hazard_control.h" />
-    <ClInclude Include="immediate_decode.h" />
-    <ClInclude Include="irq.h" />
-    <ClInclude Include="mem_align.h" />
-    <ClInclude Include="pipeline_registers.h" />
-    <ClInclude Include="program_counter.h" />
-    <ClInclude Include="registers.h" />
-    <ClInclude Include="utils.h" />
+    <ClCompile Include="..\Core\test.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.vcxproj">
+      <Project>{d6ddf5be-1fd0-414b-b3c3-f06753a687f9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Memory\Memory.vcxproj">
+      <Project>{a6462d63-a03a-47e2-beb8-02001930ddb0}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

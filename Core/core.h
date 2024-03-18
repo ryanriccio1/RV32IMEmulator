@@ -51,13 +51,4 @@ namespace RISCV
 	private:
 
 	};
-
-	Core::Core()
-	{
-		/*address.on_state_change = [this](uint64_t new_data)
-		{
-			this->data_in.set_data(new_data);
-			this->irq.set_data(new_data);
-		};*/
-	}
 }
