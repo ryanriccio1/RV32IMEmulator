@@ -52,8 +52,8 @@ namespace RISCV
 		{
 			mux1.data_in[0].set_data(a.get_data() == b.get_data());	// beq
 			mux1.data_in[1].set_data(a.get_data() != b.get_data());	// bne
-			mux1.data_in[4].set_data(CoreUtils::bitset_to_int(a) < CoreUtils::bitset_to_int(b));	// blt
-			mux1.data_in[5].set_data(CoreUtils::bitset_to_int(a) >= CoreUtils::bitset_to_int(b));	// bge
+			mux1.data_in[4].set_data(CoreUtils::bitset_to_int(a.get_data()) < CoreUtils::bitset_to_int(b.get_data()));	// blt
+			mux1.data_in[5].set_data(CoreUtils::bitset_to_int(a.get_data()) >= CoreUtils::bitset_to_int(b.get_data()));	// bge
 			mux1.data_in[6].set_data(a.get_data().to_ullong() < b.get_data().to_ullong());	// bltu
 			mux1.data_in[7].set_data(a.get_data().to_ullong() >= b.get_data().to_ullong());	// bgeu
 		}

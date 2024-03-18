@@ -2,6 +2,7 @@
 #include "alu_src.h"
 #include "branch.h"
 #include "control_logic.h"
+#include "hazard_control.h"
 #include "immediate_decode.h"
 #include "mem_align.h"
 #include "pipeline_registers.h"
@@ -26,6 +27,7 @@ namespace RISCV
 		CoreComp::MemAlign<32> mem_align;
 		CoreComp::ALUSource<32> alu_src_a;
 		CoreComp::BranchLogic<32> branch;
+		CoreComp::HazardControl hazard;
 
 		/*CoreUtils::InputPin<1> clock;
 		CoreUtils::InputPin<1> reset;

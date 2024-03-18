@@ -90,6 +90,28 @@ namespace RISCV
 		};
 
 		template <size_t bit_width>
+		class ANDGate
+		{
+		public:
+			ANDGate();
+			InputPin<bit_width> a;
+			InputPin<bit_width> b;
+
+			OutputPin<bit_width> data_out;
+		};
+
+		template <size_t bit_width>
+		class ORGate
+		{
+		public:
+			ORGate();
+			InputPin<bit_width> a;
+			InputPin<bit_width> b;
+
+			OutputPin<bit_width> data_out;
+		};
+
+		template <size_t bit_width>
 		Pin<bit_width>::Pin() : data(0) {}
 
 		template <size_t bit_width>
@@ -203,6 +225,32 @@ namespace RISCV
 		bitset<bit_width_out> ZeroExtend<bit_width_in, bit_width_out>::calc_zero_extend(bitset<bit_width_in> new_data)
 		{
 			return new_data.to_ullong();
+		}
+
+		template <size_t bit_width>
+		ANDGate<bit_width>::ANDGate()
+		{
+			a.on_state_change = [this](bitset<bit_width> new_data)
+			{
+				data_out.set_data(a.get_data() & b.get_data());
+			};
+			b.on_state_change = [this](bitset<bit_width> new_data)
+			{
+				data_out.set_data(a.get_data() & b.get_data());
+			};
+		}
+
+		template <size_t bit_width>
+		ORGate<bit_width>::ORGate()
+		{
+			a.on_state_change = [this](bitset<bit_width> new_data)
+			{
+				data_out.set_data(a.get_data() | b.get_data());
+			};
+			b.on_state_change = [this](bitset<bit_width> new_data)
+			{
+				data_out.set_data(a.get_data() | b.get_data());
+			};
 		}
 
 		template<size_t bit_width>
