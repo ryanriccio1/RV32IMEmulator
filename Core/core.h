@@ -1,4 +1,5 @@
 #pragma once
+#include "alu.h"
 #include "alu_src.h"
 #include "branch.h"
 #include "control_logic.h"
@@ -30,6 +31,7 @@ namespace RISCV
 		CoreComp::BranchLogic<32> branch;
 		CoreComp::HazardControl hazard;
 		CoreComp::ForwardControl<32> forward_control;
+		CoreComp::ALU<32> alu;
 
 		/*CoreUtils::InputPin<1> clock;
 		CoreUtils::InputPin<1> reset;
