@@ -18,6 +18,7 @@ namespace RISCV
 			CoreUtils::InputPin<5> rs2;
 			CoreUtils::InputPin<1> mem_reg_write;
 			CoreUtils::InputPin<1> wb_reg_write;
+			CoreUtils::InputPin<1> clock;
 			CoreUtils::InputPin<bit_width> data_wb;
 			CoreUtils::InputPin<bit_width> data_mem;
 
@@ -38,39 +39,43 @@ namespace RISCV
 		ForwardControl<bit_width>::ForwardControl()
 		{
 			wb_reg_dest.on_state_change = [this](bitset<5> new_data)
-				{
-					calculate_fw();
-				};
+			{
+				calculate_fw();
+			};
 			rs1.on_state_change = [this](bitset<5> new_data)
-				{
-					calculate_fw();
-				};
+			{
+				calculate_fw();
+			};
 			mem_reg_dest.on_state_change = [this](bitset<5> new_data)
-				{
-					calculate_fw();
-				};
+			{
+				calculate_fw();
+			};
 			rs2.on_state_change = [this](bitset<5> new_data)
+			{
+				calculate_fw();
+			};
+			clock.on_state_change = [this](bitset<1> new_data)
+			{
+				// keep output of forwarding unit until told to stop
+				// this allows clocking AFTER the pipeline registers have updated
+				if (new_data.to_ulong() == 1)
 				{
-					calculate_fw();
-				};
-			fw_data1_mux.data_out.on_state_change = [this](bitset<bit_width> new_data)
-				{
-					fw_data1.set_data(new_data);
-				};
-			fw_data2_mux.data_out.on_state_change = [this](bitset<bit_width> new_data)
-				{
-					fw_data2.set_data(new_data);
-				};
+					fw_en1.set_data(fw1_or_gate.data_out.get_data());
+					fw_en2.set_data(fw2_or_gate.data_out.get_data());
+					fw_data1.set_data(fw_data1_mux.data_out.get_data());
+					fw_data2.set_data(fw_data2_mux.data_out.get_data());
+				}
+			};
 			data_wb.on_state_change = [this](bitset<bit_width> new_data)
-				{
-					fw_data1_mux.data_in[0].set_data(new_data);
-					fw_data2_mux.data_in[0].set_data(new_data);
-				};
+			{
+				fw_data1_mux.data_in[0].set_data(new_data);
+				fw_data2_mux.data_in[0].set_data(new_data);
+			};
 			data_mem.on_state_change = [this](bitset<bit_width> new_data)
-				{
-					fw_data1_mux.data_in[1].set_data(new_data);
-					fw_data2_mux.data_in[1].set_data(new_data);
-				};
+			{
+				fw_data1_mux.data_in[1].set_data(new_data);
+				fw_data2_mux.data_in[1].set_data(new_data);
+			};
 		}
 
 		template <size_t bit_width>

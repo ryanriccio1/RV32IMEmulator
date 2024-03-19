@@ -66,8 +66,8 @@ namespace RISCV
 			};
 			or_mem_operation.data_out.on_state_change = [this](bitset<1> new_data)
 			{
-				or_pc_en.b.set_data(new_data.flip());
 				address_source.set_data(new_data);
+				or_pc_en.b.set_data(new_data.flip());
 			};
 			or_pc_en.data_out.on_state_change = [this](bitset<1> new_data)
 			{

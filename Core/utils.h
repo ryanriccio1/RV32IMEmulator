@@ -165,6 +165,14 @@ namespace RISCV
 					if (reset_pin != 0)
 						this->data_out.set_data(0);
 				};
+			//data_in.on_state_change = [this](bitset<bit_width> new_data)
+			//	{
+			//		bitset<1> clock_val = clock.get_data();
+			//		if (!this->rising_edge)
+			//			clock_val = ~clock_val;
+			//		if ((write_enable.get_data() & clock_val).to_ullong() != 0)
+			//			this->data_out.set_data(new_data);
+			//	};
 		}
 
 		template <size_t bit_width, size_t control_bits>
@@ -199,7 +207,7 @@ namespace RISCV
 		{
 			data_in.on_state_change = [this](bitset<bit_width_in> new_data)
 				{
-					bitset<bit_width_in> bitmask = (1 << (ending_bit + 1)) - 1;
+					bitset<bit_width_in> bitmask = (static_cast<uint64_t>(1) << (ending_bit + 1)) - 1;
 					bitmask >>= starting_bit;
 					bitmask <<= starting_bit;
 					this->data_out.set_data(((new_data & bitmask) >> starting_bit).to_ullong());
@@ -221,7 +229,7 @@ namespace RISCV
 			uint64_t data = new_data.to_ullong();
 			if (new_data[bit_width_in - 1] == 1)
 			{
-				const uint64_t bitmask = ((1 << (64 - bit_width_out)) - 1) << bit_width_in;
+				const uint64_t bitmask = ((static_cast<uint64_t>(1) << (64 - bit_width_out)) - 1) << bit_width_in;
 				data |= bitmask;
 			}
 			return data;
@@ -272,7 +280,7 @@ namespace RISCV
 		Counter<bit_width, max_value>::Counter() : Counter(true) {}
 
 		template <size_t bit_width, size_t max_value>
-		Counter<bit_width, max_value>::Counter(bool stay_at_value)
+		Counter<bit_width, max_value>::Counter(bool stay_at_value) : count(0)
 		{
 			reset.on_state_change = [this](bitset<1> new_data)
 			{

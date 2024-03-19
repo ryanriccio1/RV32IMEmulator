@@ -57,6 +57,10 @@ namespace RISCV
 			{
 				mux1.data_in[1].set_data(new_data);
 			};
+			mux1.data_out.on_state_change = [this](bitset<bit_width> new_data)
+			{
+				instruction_reg.data_in.set_data(new_data);
+			};
 
 			PC_en.on_state_change = [this](bitset<1> new_data)
 			{

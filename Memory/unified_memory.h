@@ -20,7 +20,7 @@ namespace RISCV
 
 		array<CoreUtils::OutputPin<bit_width>, num_data_channels> data_out;
 
-		void load_memory_contents(unique_ptr<uint8_t[]> new_memory);
+		void load_memory_contents(unique_ptr<uint8_t[]>& new_memory);
 	private:
 		unique_ptr<uint8_t[]> memory;
 		void write_memory(size_t idx);
@@ -49,9 +49,9 @@ namespace RISCV
 	}
 
 	template <size_t bit_width, size_t len, size_t num_data_channels>
-	void UnifiedMemory<bit_width, len, num_data_channels>::load_memory_contents(unique_ptr<uint8_t[]> new_memory)
+	void UnifiedMemory<bit_width, len, num_data_channels>::load_memory_contents(unique_ptr<uint8_t[]>& new_memory)
 	{
-		memory = move(new_memory);
+		memory = std::move(new_memory);
 	}
 
 	template <size_t bit_width, size_t len, size_t num_data_channels>
@@ -67,8 +67,10 @@ namespace RISCV
 		case 0b10:	// word
 			memory[address_base + 3] = data_to_write[3];
 			memory[address_base + 2] = data_to_write[2];
+			[[fallthrough]];
 		case 0b01:	// half-word
 			memory[address_base + 1] = data_to_write[1];
+			[[fallthrough]];
 		case 0b00:	// byte
 			memory[address_base] = data_to_write[0];
 		}
@@ -79,10 +81,10 @@ namespace RISCV
 	{
 		auto address_base = address[idx].get_data().to_ullong();
 		uint64_t accumulator{ 0 };
-		for (size_t i{ bit_width / 8 - 1}; i >= 0 / 8; --i)
+		for (int i{ bit_width / 8 - 1}; i >= 0; --i)
 		{
-			accumulator |= memory[address_base + i];
 			accumulator <<= 8;
+			accumulator |= memory[address_base + i];
 		}
 		bitset<bit_width> new_data{ accumulator };
 		return new_data;

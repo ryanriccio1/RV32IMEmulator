@@ -73,7 +73,7 @@ namespace RISCV
 					control_word = RF_SRC_ALU | RF_WE | ALU_OP_RTYPE | ALU_A_REG | ALU_B_REG;
 					break;
 				default:
-					control_word = 0x7FF;
+					control_word = 0x000;
 					break;
 				}
 				data_out.set_data(control_word);

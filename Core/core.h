@@ -69,12 +69,13 @@ namespace RISCV
 	{
 		clock.on_state_change = [this](bitset<1> new_data)
 		{
-			if_id.clock.set_data(new_data);
-			id_ex.clock.set_data(new_data);
-			ex_mem.clock.set_data(new_data);
 			mem_wb.clock.set_data(new_data);
+			ex_mem.clock.set_data(new_data);
+			id_ex.clock.set_data(new_data);
+			if_id.clock.set_data(new_data);
 
 			hazard_control.clock.set_data(new_data);
+			forward_control.clock.set_data(new_data);
 			irq_control.clock.set_data(new_data);
 
 			PC.clock.set_data(new_data);
@@ -82,14 +83,14 @@ namespace RISCV
 		};
 		reset.on_state_change = [this](bitset<1> new_data)
 		{
-			ex_mem.clock.set_data(new_data);
-			mem_wb.clock.set_data(new_data);
+			ex_mem.reset.set_data(new_data);
+			mem_wb.reset.set_data(new_data);
 
-			hazard_control.clock.set_data(new_data);
-			irq_control.clock.set_data(new_data);
+			hazard_control.reset.set_data(new_data);
+			irq_control.reset.set_data(new_data);
 
-			PC.clock.set_data(new_data);
-			registers.clock.set_data(new_data);
+			PC.reset.set_data(new_data);
+			registers.reset.set_data(new_data);
 		};
 		data_in.on_state_change = [this](bitset<bit_width> new_data)
 		{
@@ -321,8 +322,8 @@ namespace RISCV
 		ex_mem.mem_read.on_state_change = [this](bitset<1> new_data)
 		{
 			memory_read_en.set_data(new_data);
-			mem_fw_src_mux.select.set_data(new_data.flip());
 			hazard_control.mem_read.set_data(new_data);
+			mem_fw_src_mux.select.set_data(new_data.flip());
 		};
 		ex_mem.mem_write.on_state_change = [this](bitset<1> new_data)
 		{

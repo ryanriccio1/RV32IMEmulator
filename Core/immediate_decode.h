@@ -28,12 +28,12 @@ namespace RISCV
 				case 0x19:
 				case 0x04:
 					// I-type
-					data_val = CoreUtils::SignExtend<12, 32>::calc_sign_extend(data_val).to_ullong();
+					data_val = CoreUtils::SignExtend<12, 32>::calc_sign_extend(data_val >> 20).to_ullong();
 					break;
 
 				case 0x08:
 					// S-type
-					data_val = (data_val & 0xFE000000) >> 59 | (CoreUtils::SignExtend<7, 27>::calc_sign_extend(data_val >> 25) << 5).to_ullong();
+					data_val = (CoreUtils::SignExtend<7, 27>::calc_sign_extend((data_val & 0xFE000000) >> 25).to_ullong() << 5) | (data_val & 0xF80) >> 7;
 					break;
 
 				case 0x18:

@@ -66,7 +66,7 @@ namespace RISCV
 				return b_dat;
 
 			if (!funct3_en)
-				return a_dat + b_dat;
+ 				return a_dat + b_dat;
 
 			switch (funct3.get_data().to_ullong())
 			{

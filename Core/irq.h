@@ -42,6 +42,8 @@ namespace RISCV
 			reset.on_state_change = [this](bitset<1> new_data)
 			{
 				reset_or.b.set_data(new_data);
+				insert_nop.set_data(0);
+				pc_stop.set_data(0);
 			};
 			reset_or.data_out.on_state_change = [this](bitset<1> new_data)
 			{
@@ -50,11 +52,11 @@ namespace RISCV
 			};
 			irq_in.on_state_change = [this](bitset<1> new_data)
 			{
-				reset_or.a.set_data(new_data.flip());
 				nop_counter.write_enable.set_data(new_data);
 				pc_counter.write_enable.set_data(new_data);
 				nop_and.a.set_data(new_data);
 				pc_and.a.set_data(new_data);
+				reset_or.a.set_data(new_data.flip());
 			};
 			nop_counter.data_out.on_state_change = [this](bitset<1> new_data)
 			{

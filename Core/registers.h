@@ -42,6 +42,7 @@ namespace RISCV
 					rs2_mux.data_in[idx].set_data(new_data);
 				};
 				registers[idx].data_out.set_data(0);
+				registers[idx].write_enable.set_data(0);
 			}
 			clock.on_state_change = [this](bitset<1> new_data)
 			{
