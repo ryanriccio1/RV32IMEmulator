@@ -24,7 +24,6 @@ namespace RISCV
 			CoreUtils::OutputPin<bit_width> instruction_out;
 			CoreUtils::OutputPin<5> rs1;
 			CoreUtils::OutputPin<5> rs2;
-			CoreUtils::OutputPin<1> clock_out;
 
 		private:
 			CoreUtils::Register<bit_width> PC_reg;
@@ -66,7 +65,6 @@ namespace RISCV
 
 			clock.on_state_change = [this](bitset<1> new_data)
 			{
-				clock_out.set_data(new_data);
 				PC_reg.clock.set_data(new_data);
 				PC4_reg.clock.set_data(new_data);
 				instruction_reg.clock.set_data(new_data);

@@ -5,6 +5,6 @@
 
 int main()
 {
-	auto core = new RISCV::Core();
+	auto core = new RISCV::Core<32>();
 	auto memory = new RISCV::UnifiedMemory<32, 1000000, 4>();
 }
