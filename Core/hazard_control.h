@@ -41,11 +41,13 @@ namespace RISCV
 			};			
 			jump_branch_ex.on_state_change = [this](bitset<1> new_data)
 			{
+				//	flush.set_data(new_data);
 				reg1.data_in.set_data(new_data);
 				or_pc_en.a.set_data(new_data);
 			};
 			jump_branch_mem.on_state_change = [this](bitset<1> new_data)
 			{
+					flush.set_data(new_data);
 				reg1.reset.set_data(new_data);
 			};
 			mem_read.on_state_change = [this](bitset<1> new_data)

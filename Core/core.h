@@ -31,13 +31,16 @@ namespace RISCV
 		CoreUtils::OutputPin<1> memory_read_en;
 		CoreUtils::OutputPin<1> memory_write_en;
 
+		//const vector<CoreUtils::Register<bit_width>>& register_reader;	// for debugging
+
+
 	private:
 		CoreComp::IF_ID<bit_width> if_id;
 		CoreComp::ID_EX<bit_width> id_ex;
 		CoreComp::EX_MEM<bit_width> ex_mem;
 		CoreComp::MEM_WB<bit_width> mem_wb;
 
-		CoreComp::HazardControl hazard_control; 
+		CoreComp::HazardControl *hazard_control; 
 		CoreComp::ForwardControl<bit_width> forward_control;
 		CoreComp::IRQControl<bit_width> irq_control;
 
@@ -62,31 +65,36 @@ namespace RISCV
 		CoreUtils::ANDGate<1> branch_logic_and;
 		CoreUtils::ORGate<1> jump_logic_or;
 
+		bool first_clock_cycle;
 	};
 
 	template <size_t bit_width>
-	Core<bit_width>::Core()
+	Core<bit_width>::Core() : first_clock_cycle(true), hazard_control(new CoreComp::HazardControl)
 	{
+		PC.PC_src.set_data(0);
 		clock.on_state_change = [this](bitset<1> new_data)
 		{
+			registers.clock.set_data(new_data);
+			hazard_control->clock.set_data(new_data);
+
 			mem_wb.clock.set_data(new_data);
 			ex_mem.clock.set_data(new_data);
 			id_ex.clock.set_data(new_data);
+			forward_control.clock.set_data(new_data);
 			if_id.clock.set_data(new_data);
 
-			hazard_control.clock.set_data(new_data);
-			forward_control.clock.set_data(new_data);
-			irq_control.clock.set_data(new_data);
-
-			PC.clock.set_data(new_data);
-			registers.clock.set_data(new_data);
+			if (!first_clock_cycle)
+				PC.clock.set_data(new_data);
+			else if (new_data == 0)
+				first_clock_cycle = false;
+			// irq_control.clock.set_data(new_data);
 		};
 		reset.on_state_change = [this](bitset<1> new_data)
 		{
 			ex_mem.reset.set_data(new_data);
 			mem_wb.reset.set_data(new_data);
 
-			hazard_control.reset.set_data(new_data);
+			hazard_control->reset.set_data(new_data);
 			irq_control.reset.set_data(new_data);
 
 			PC.reset.set_data(new_data);
@@ -274,6 +282,7 @@ namespace RISCV
 		};
 		alu.result.on_state_change = [this](bitset<bit_width> new_data)
 		{
+			PC.PC_in.set_data(new_data);
 			ex_mem.alu_result.set_data(new_data);
 		};
 		branch.branch.on_state_change = [this](bitset<1> new_data)
@@ -287,20 +296,20 @@ namespace RISCV
 		jump_logic_or.data_out.on_state_change = [this](bitset<1> new_data)
 		{
 			ex_mem.jump_branch.set_data(new_data);
-			hazard_control.jump_branch_ex.set_data(new_data);
+			hazard_control->jump_branch_ex.set_data(new_data);
 			PC.PC_src.set_data(new_data);
 		};
-		hazard_control.flush.on_state_change = [this](bitset<1> new_data)
+		hazard_control->flush.on_state_change = [this](bitset<1> new_data)
 		{
 			id_ex.reset.set_data(new_data);
 			if_id.reset.set_data(new_data);
 		};
-		hazard_control.PC_en.on_state_change = [this](bitset<1> new_data)
+		hazard_control->PC_en.on_state_change = [this](bitset<1> new_data)
 		{
 			PC.PC_en.set_data(new_data);
 			if_nop_and.b.set_data(new_data);
 		};
-		hazard_control.address_source.on_state_change = [this](bitset<1> new_data)
+		hazard_control->address_source.on_state_change = [this](bitset<1> new_data)
 		{
 			address_src_mux.select.set_data(new_data);
 		};
@@ -322,13 +331,13 @@ namespace RISCV
 		ex_mem.mem_read.on_state_change = [this](bitset<1> new_data)
 		{
 			memory_read_en.set_data(new_data);
-			hazard_control.mem_read.set_data(new_data);
+			hazard_control->mem_read.set_data(new_data);
 			mem_fw_src_mux.select.set_data(new_data.flip());
 		};
 		ex_mem.mem_write.on_state_change = [this](bitset<1> new_data)
 		{
 			memory_write_en.set_data(new_data);
-			hazard_control.mem_write.set_data(new_data);
+			hazard_control->mem_write.set_data(new_data);
 		};
 		ex_mem.reg_dest_out.on_state_change = [this](bitset<5> new_data)
 		{
@@ -349,7 +358,7 @@ namespace RISCV
 		};
 		ex_mem.jump_branch_out.on_state_change = [this](bitset<1> new_data)
 		{
-			hazard_control.jump_branch_mem.set_data(new_data);
+			hazard_control->jump_branch_mem.set_data(new_data);
 		};
 		mem_fw_src_mux.data_out.on_state_change = [this](bitset<bit_width> new_data)
 		{

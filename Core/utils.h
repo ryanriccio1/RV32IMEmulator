@@ -22,7 +22,7 @@ namespace RISCV
 			bitset<bit_width> data;
 		};
 
-		
+
 
 		template <size_t bit_width>
 		class OutputPin : public Pin<bit_width>
@@ -48,6 +48,7 @@ namespace RISCV
 			OutputPin<bit_width> data_out;
 		private:
 			bool rising_edge;
+			bool resetting;
 		};
 
 		template <size_t bit_width, size_t control_bits>
@@ -153,26 +154,26 @@ namespace RISCV
 		Register<bit_width>::Register(bool rising_edge) : rising_edge(rising_edge)
 		{
 			clock.on_state_change = [this](bitset<1> new_data)
+			{
+				if (!resetting)
 				{
 					bitset<1> clock_val = new_data;
 					if (!this->rising_edge)
 						clock_val = ~clock_val;
-					if ((this->write_enable.get_data() & clock_val).to_ullong() != 0)
-						this->data_out.set_data(this->data_in.get_data());
-				};
+					if ((write_enable.get_data() & clock_val).to_ullong() != 0)
+						data_out.set_data(data_in.get_data());
+				}
+			};
 			reset.on_state_change = [this](bitset<1> reset_pin)
+			{
+				if (reset_pin != 0)
 				{
-					if (reset_pin != 0)
-						this->data_out.set_data(0);
-				};
-			//data_in.on_state_change = [this](bitset<bit_width> new_data)
-			//	{
-			//		bitset<1> clock_val = clock.get_data();
-			//		if (!this->rising_edge)
-			//			clock_val = ~clock_val;
-			//		if ((write_enable.get_data() & clock_val).to_ullong() != 0)
-			//			this->data_out.set_data(new_data);
-			//	};
+					data_out.set_data(0);
+					resetting = true;
+				}
+				else
+					resetting = false;
+			};
 		}
 
 		template <size_t bit_width, size_t control_bits>
@@ -181,7 +182,7 @@ namespace RISCV
 			select.on_state_change = [this](bitset<control_bits> new_data)
 				{
 					size_t current_idx{ 0 };
-					for(InputPin<bit_width> &input_pin : this->data_in)
+					for (InputPin<bit_width>& input_pin : this->data_in)
 					{
 						if (current_idx == new_data.to_ullong())
 						{
@@ -218,9 +219,9 @@ namespace RISCV
 		SignExtend<bit_width_in, bit_width_out>::SignExtend()
 		{
 			data_in.on_state_change = [this](bitset<bit_width_in> new_data)
-			{
-				data_out.set_data(calc_sign_extend(new_data));
-			};
+				{
+					data_out.set_data(calc_sign_extend(new_data));
+				};
 		}
 
 		template <size_t bit_width_in, size_t bit_width_out>
@@ -239,9 +240,9 @@ namespace RISCV
 		ZeroExtend<bit_width_in, bit_width_out>::ZeroExtend()
 		{
 			data_in.on_state_change = [this](bitset<bit_width_in> new_data)
-			{
-				data_out.set_data(calc_zero_extend(new_data));
-			};
+				{
+					data_out.set_data(calc_zero_extend(new_data));
+				};
 		}
 
 		template <size_t bit_width_in, size_t bit_width_out>
@@ -254,26 +255,26 @@ namespace RISCV
 		ANDGate<bit_width>::ANDGate()
 		{
 			a.on_state_change = [this](bitset<bit_width> new_data)
-			{
-				data_out.set_data(a.get_data() & b.get_data());
-			};
+				{
+					data_out.set_data(a.get_data() & b.get_data());
+				};
 			b.on_state_change = [this](bitset<bit_width> new_data)
-			{
-				data_out.set_data(a.get_data() & b.get_data());
-			};
+				{
+					data_out.set_data(a.get_data() & b.get_data());
+				};
 		}
 
 		template <size_t bit_width>
 		ORGate<bit_width>::ORGate()
 		{
 			a.on_state_change = [this](bitset<bit_width> new_data)
-			{
-				data_out.set_data(a.get_data() | b.get_data());
-			};
+				{
+					data_out.set_data(a.get_data() | b.get_data());
+				};
 			b.on_state_change = [this](bitset<bit_width> new_data)
-			{
-				data_out.set_data(a.get_data() | b.get_data());
-			};
+				{
+					data_out.set_data(a.get_data() | b.get_data());
+				};
 		}
 
 		template <size_t bit_width, size_t max_value>
@@ -283,32 +284,32 @@ namespace RISCV
 		Counter<bit_width, max_value>::Counter(bool stay_at_value) : count(0)
 		{
 			reset.on_state_change = [this](bitset<1> new_data)
-			{
-				if (new_data == 1)
 				{
-					count = 0;
-					data_out.set_data(0);
-				}
-			};
-			clock.on_state_change = [this, stay_at_value](bitset<1> new_data)
-			{
-				if (new_data == 1 && write_enable.get_data() == 1)
-				{
-					count++;
-					if (count == max_value)
-						data_out.set_data(1);
-					if (count > max_value)
+					if (new_data == 1)
 					{
-						if (stay_at_value)
-							count--;
-						else
+						count = 0;
+						data_out.set_data(0);
+					}
+				};
+			clock.on_state_change = [this, stay_at_value](bitset<1> new_data)
+				{
+					if (new_data == 1 && write_enable.get_data() == 1)
+					{
+						count++;
+						if (count == max_value)
+							data_out.set_data(1);
+						if (count > max_value)
 						{
-							count = 0;
-							data_out.set_data(0);
+							if (stay_at_value)
+								count--;
+							else
+							{
+								count = 0;
+								data_out.set_data(0);
+							}
 						}
 					}
-				}
-			};
+				};
 		}
 
 		template<size_t bit_width>

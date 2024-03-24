@@ -95,7 +95,14 @@ namespace RISCV
 				splitter_rs1.data_in.set_data(new_data);
 				splitter_rs2.data_in.set_data(new_data);
 			};
-
+			splitter_rs1.data_out.on_state_change = [this](bitset<5> new_data)
+			{
+				rs1.set_data(new_data);
+			};
+			splitter_rs2.data_out.on_state_change = [this](bitset<5> new_data)
+			{
+				rs2.set_data(new_data);
+			};
 		}
 
 		template <size_t bit_width>
@@ -374,13 +381,13 @@ namespace RISCV
 			};
 			clock.on_state_change = [this](bitset<1> new_data)
 			{
-				alu_result_reg.clock.set_data(new_data);
 				funct3_reg.clock.set_data(new_data);
 				reg_b_reg.clock.set_data(new_data);
 				reg_dest_reg.clock.set_data(new_data);
 				PC4_reg.clock.set_data(new_data);
 				control_word_reg.clock.set_data(new_data);
 				jump_branch_reg.clock.set_data(new_data);
+				alu_result_reg.clock.set_data(new_data);
 			};
 			reset.on_state_change = [this](bitset<1> new_data)
 			{

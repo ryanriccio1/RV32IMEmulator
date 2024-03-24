@@ -20,6 +20,7 @@ namespace RISCV
 			CoreUtils::OutputPin<bit_width> PC;
 			CoreUtils::OutputPin<bit_width> PC4;
 		private:
+			bitset<bit_width> PC_data;
 			CoreUtils::Multiplexer<bit_width, 1> mux1;
 			CoreUtils::Multiplexer<bit_width, 1> mux2;
 			CoreUtils::Multiplexer<bit_width, 1> mux3;

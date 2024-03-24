@@ -35,7 +35,7 @@ namespace RISCV
 		{
 			clock[i].on_state_change = [this, i](bitset<1> new_data)
 			{
-				if (new_data.to_ullong() == 1 && enable.get_data().to_ullong() == 1)
+				if (new_data== 0 && enable.get_data() == 1)
 					write_memory(i);
 			};
 		}
