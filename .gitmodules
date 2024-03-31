@@ -7,6 +7,6 @@
 [submodule "SDL"]
 	path = SDL
 	url = https://github.com/libsdl-org/SDL.git
-[submodule "multifunction"]
-	path = multifunction
-	url = https://github.com/klmr/multifunction.git
+[submodule "ImGuiFileDialog"]
+	path = ImGuiFileDialog
+	url = https://github.com/aiekick/ImGuiFileDialog

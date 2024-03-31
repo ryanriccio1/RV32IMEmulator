@@ -1,17 +1,21 @@
 #pragma once
-#include "../Core/utils.h"
 #include <cstdint>
 #include <memory>
+
+#include "../Core/utils.h"
+#include "../VideoInterface/video_interface.h"
 
 namespace RISCV
 {
 	using namespace std;
 
-	template <size_t bit_width, size_t len, size_t num_data_channels>
+	template <size_t bit_width, size_t num_data_channels>
 	class UnifiedMemory
 	{
 	public:
+		friend VideoInterface;
 		UnifiedMemory();
+		UnifiedMemory(const size_t& memory_size);
 		array<CoreUtils::InputPin<bit_width>, num_data_channels> address;
 		array<CoreUtils::InputPin<bit_width>, num_data_channels> data_in;
 		array<CoreUtils::InputPin<2>, num_data_channels> data_type;
@@ -20,24 +24,31 @@ namespace RISCV
 
 		array<CoreUtils::OutputPin<bit_width>, num_data_channels> data_out;
 
-		void load_memory_contents(unique_ptr<uint8_t[]>& new_memory);
+		void load_memory_contents(shared_ptr<uint8_t[]>& new_memory);
+		shared_ptr<uint8_t[]> get_memory_ptr();
+		//void* get_raw_pointer() const;
 	private:
-		unique_ptr<uint8_t[]> memory;
+		size_t memory_size;
+		shared_ptr<uint8_t[]> memory;
+
 		void write_memory(size_t idx);
 		bitset<bit_width> get_memory(size_t idx);
 		static void bitset_to_byte_array(array<uint8_t, bit_width / 8>& byte_array, bitset<bit_width> data);
 	};
 
-	template <size_t bit_width, size_t len, size_t num_data_channels>
-	UnifiedMemory<bit_width, len, num_data_channels>::UnifiedMemory() : memory(new uint8_t[len])
+	template <size_t bit_width, size_t num_data_channels>
+	UnifiedMemory<bit_width, num_data_channels>::UnifiedMemory() : UnifiedMemory(0x100000) {}
+
+	template <size_t bit_width, size_t num_data_channels>
+	UnifiedMemory<bit_width, num_data_channels>::UnifiedMemory(const size_t& memory_size) : memory_size(memory_size), memory(new uint8_t[memory_size])
 	{
-		for (size_t i {0}; i < num_data_channels; i++)
+		for (size_t i{ 0 }; i < num_data_channels; i++)
 		{
 			clock[i].on_state_change = [this, i](bitset<1> new_data)
-			{
-				if (new_data== 0 && enable.get_data() == 1)
-					write_memory(i);
-			};
+				{
+					if (new_data == 0 && enable.get_data() == 1)
+						write_memory(i);
+				};
 		}
 		for (size_t i{ 0 }; i < num_data_channels; i++)
 		{
@@ -48,14 +59,26 @@ namespace RISCV
 		}
 	}
 
-	template <size_t bit_width, size_t len, size_t num_data_channels>
-	void UnifiedMemory<bit_width, len, num_data_channels>::load_memory_contents(unique_ptr<uint8_t[]>& new_memory)
+	template <size_t bit_width, size_t num_data_channels>
+	void UnifiedMemory<bit_width, num_data_channels>::load_memory_contents(shared_ptr<uint8_t[]>& new_memory)
 	{
-		memory = std::move(new_memory);
+		memory = new_memory;
 	}
 
-	template <size_t bit_width, size_t len, size_t num_data_channels>
-	void UnifiedMemory<bit_width, len, num_data_channels>::write_memory(size_t idx)
+	template <size_t bit_width, size_t num_data_channels>
+	shared_ptr<uint8_t[]> UnifiedMemory<bit_width, num_data_channels>::get_memory_ptr()
+	{
+		return memory;
+	}
+
+	/*template <size_t bit_width, size_t len, size_t num_data_channels>
+	void* UnifiedMemory<bit_width, len, num_data_channels>::get_raw_pointer() const
+	{
+		return memory.get();
+	}*/
+
+	template <size_t bit_width, size_t num_data_channels>
+	void UnifiedMemory<bit_width, num_data_channels>::write_memory(size_t idx)
 	{
 		array<uint8_t, bit_width / 8> byte_array;
 		bitset_to_byte_array(byte_array, data_in[idx].get_data());
@@ -76,8 +99,8 @@ namespace RISCV
 		}
 	}
 
-	template <size_t bit_width, size_t len, size_t num_data_channels>
-	bitset<bit_width> UnifiedMemory<bit_width, len, num_data_channels>::get_memory(size_t idx)
+	template <size_t bit_width, size_t num_data_channels>
+	bitset<bit_width> UnifiedMemory<bit_width, num_data_channels>::get_memory(size_t idx)
 	{
 		auto address_base = address[idx].get_data().to_ullong();
 		uint64_t accumulator{ 0 };
@@ -90,8 +113,8 @@ namespace RISCV
 		return new_data;
 	}
 
-	template <size_t bit_width, size_t len, size_t num_data_channels>
-	void UnifiedMemory<bit_width, len, num_data_channels>::bitset_to_byte_array(
+	template <size_t bit_width, size_t num_data_channels>
+	void UnifiedMemory<bit_width, num_data_channels>::bitset_to_byte_array(
 		array<uint8_t, bit_width / 8>& byte_array,
 		bitset<bit_width> data)
 	{	// least significant byte in the lowest memory position

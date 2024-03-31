@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{2db6bb60-29ec-49b8-a8ef-91e3053981ca}</ProjectGuid>
-    <RootNamespace>Computer</RootNamespace>
+    <ProjectGuid>{32c31116-21c0-4222-b589-ffdf80e4a862}</ProjectGuid>
+    <RootNamespace>VideoInterface</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -131,21 +131,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.vcxproj">
-      <Project>{d6ddf5be-1fd0-414b-b3c3-f06753a687f9}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\MemoryManagementUnit\MemoryManagementUnit.vcxproj">
-      <Project>{9d6dafc1-8655-4be9-9427-3393a484ca0a}</Project>
-    </ProjectReference>
+    <ClInclude Include="video_interface.h" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Memory\Memory.vcxproj">
       <Project>{a6462d63-a03a-47e2-beb8-02001930ddb0}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\PeripheralInterfaceAdapter\PeripheralInterfaceAdapter.vcxproj">
-      <Project>{05652190-77bd-461a-ae54-36d1d6d9fdeb}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="computer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

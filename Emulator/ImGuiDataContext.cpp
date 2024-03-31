@@ -2,11 +2,12 @@
 
 using namespace std;
 ImGuiDataContext::ImGuiDataContext(const string& window_name, Uint32 SDL_flags, Uint32 window_flags, Uint32 renderer_flags,
-                                   ImGuiConfigFlags io_config_flags, int base_width, int base_height) :
+                                   ImGuiConfigFlags io_config_flags, int base_width, int base_height, shared_ptr<Computer::Computer>& computer) :
 	io{(ImGui::CreateContext(), ImGui::GetIO())},
 	style{ImGui::GetStyle()},
 	base_width{base_width},
-	base_height{base_height}
+	base_height{base_height},
+	computer{computer}
 {
     // Setup SDL
     if (SDL_Init(SDL_flags) != 0)
@@ -47,6 +48,7 @@ ImGuiDataContext::ImGuiDataContext(const string& window_name, Uint32 SDL_flags, 
     im_window_flags |= ImGuiWindowFlags_NoMove;
     im_window_flags |= ImGuiWindowFlags_NoResize;
     im_window_flags |= ImGuiWindowFlags_NoCollapse;
+    im_window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 
     last_scale = 1.0f;
 
@@ -58,6 +60,12 @@ ImGuiDataContext::ImGuiDataContext(const string& window_name, Uint32 SDL_flags, 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer3_Init(renderer);
+    SDL_SetRenderDrawColor(renderer, 114, 140, 153, 255);
+
+    emulator_screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 320, 240);
+    SDL_SetTextureScaleMode(emulator_screen, SDL_SCALEMODE_NEAREST);
+
+    current_window = CurrentWindow::None;
 }
 
 ImGuiDataContext::~ImGuiDataContext()
@@ -82,12 +90,8 @@ void ImGuiDataContext::NewFrame()
 
 void ImGuiDataContext::Render()
 {
-    static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
     // Rendering
     ImGui::Render();
-    //SDL_RenderSetScale(renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
-    SDL_SetRenderDrawColor(renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
     SDL_RenderClear(renderer);
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData());
     SDL_RenderPresent(renderer);
@@ -107,6 +111,27 @@ SDL_WindowID ImGuiDataContext::GetWindowID() const
     return SDL_GetWindowID(window);
 }
 
+void ImGuiDataContext::ReadFileToComputer(const string& filePathName) const
+{
+    auto file_contents = shared_ptr<uint8_t[]>(new uint8_t[computer->get_memory_size()]);
+
+	ifstream file(filePathName, std::ios::binary);
+    file.seekg(0, std::ios::end);
+    const streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    memset(file_contents.get(), 0, computer->get_memory_size());
+    file.read(reinterpret_cast<char*>(file_contents.get()), min(size, static_cast<streamsize>(computer->get_memory_size())));
+    file.close();
+
+    computer->load_memory_contents(file_contents);
+}
+
+void ImGuiDataContext::UpdateVideoBufferPointer()
+{
+    video_buffer = computer->get_video_memory();
+}
+
 void ImGuiDataContext::SetWindowSize(const float& width, const float& height, const int pos_x, const int pos_y) const
 {
     const auto windowSize = ImVec2(base_width * (width / 100) * dpi_scale, base_height * (height / 100) * dpi_scale);
@@ -118,114 +143,87 @@ void ImGuiDataContext::SetWindowSize(const float& width, const float& height, co
 void ImGuiDataContext::Update()
 {
 	ImGui::BeginMainMenuBar();
-
+    computer->video_interface->update_memory();
     if (ImGui::BeginMenu("File"))
     {
-        ShowExampleMenuFile();
+        ShowMenuFile();
         ImGui::EndMenu();
     }
-    if (ImGui::BeginMenu("Edit"))
+    if (ImGui::BeginMenu("Options"))
     {
-        if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-        if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
-        ImGui::Separator();
-        if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-        if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-        if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+        ShowMenuOptions();
         ImGui::EndMenu();
     }
     ImGui::EndMainMenuBar();
-    
+
+    // Emulator
     SetWindowSize(75,75,0,0);
     ImGui::Begin("Emulator", nullptr, im_window_flags);
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+    if (ImGui::IsWindowFocused())
+    {
+        current_window = CurrentWindow::Emulator;
+    }
+	SDL_UpdateTexture(emulator_screen, nullptr, computer->get_video_memory().get(), computer->get_video_width() * 4);
+
+    ImGui::Image(emulator_screen, ImVec2(computer->get_video_width() * 2 * dpi_scale,computer->get_video_height() * 2 * dpi_scale));
     ImGui::End();
 
+    // Console
     SetWindowSize(75, 25, 0, 75);
     ImGui::Begin("Console", nullptr, im_window_flags);
+    if (ImGui::IsWindowFocused())
+        current_window = CurrentWindow::Console;
     ImGui::End();
 
+    // Registers
     SetWindowSize(25, 50, 75, 0);
     ImGui::Begin("Registers", nullptr, im_window_flags);
+    if (ImGui::IsWindowFocused())
+        current_window = CurrentWindow::Registers;
     ImGui::End();
 
+    // Memory
     SetWindowSize(25, 50, 75, 50);
     ImGui::Begin("Memory", nullptr, im_window_flags);
+    if (ImGui::IsWindowFocused())
+        current_window = CurrentWindow::Memory;
     ImGui::End();
+
+    // File Dialog
+    SetWindowSize(80, 80, 10, 10);
+    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
+        if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
+            const string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            const string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+            ReadFileToComputer(filePath + IGFD::Utils::GetPathSeparator() + filePathName);
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
 }
 
-void ImGuiDataContext::ShowExampleMenuFile()
+void ImGuiDataContext::ShowMenuFile()
 {
-    ImGui::MenuItem("(demo menu)", NULL, false, false);
-    if (ImGui::MenuItem("New")) {}
-    if (ImGui::MenuItem("Open", "Ctrl+O")) {}
-    if (ImGui::BeginMenu("Open Recent"))
+    ImGui::MenuItem("Emulator Options", nullptr, false, false);
+    if (ImGui::MenuItem("Open", "Ctrl+O"))
     {
-        ImGui::MenuItem("fish_hat.c");
-        ImGui::MenuItem("fish_hat.inl");
-        ImGui::MenuItem("fish_hat.h");
-        if (ImGui::BeginMenu("More.."))
-        {
-            ImGui::MenuItem("Hello");
-            ImGui::MenuItem("Sailor");
-            if (ImGui::BeginMenu("Recurse.."))
-            {
-                ShowExampleMenuFile();
-                ImGui::EndMenu();
-            }
-            ImGui::EndMenu();
-        }
-        ImGui::EndMenu();
+        IGFD::FileDialogConfig config;
+        config.path = ".";
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".bin", config);
     }
-    if (ImGui::MenuItem("Save", "Ctrl+S")) {}
-    if (ImGui::MenuItem("Save As..")) {}
-
     ImGui::Separator();
-    if (ImGui::BeginMenu("Options"))
-    {
-        static bool enabled = true;
-        ImGui::MenuItem("Enabled", "", &enabled);
-        ImGui::BeginChild("child", ImVec2(0, 60), ImGuiChildFlags_Border);
-        for (int i = 0; i < 10; i++)
-            ImGui::Text("Scrolling Text %d", i);
-        ImGui::EndChild();
-        static float f = 0.5f;
-        static int n = 0;
-        ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
-        ImGui::InputFloat("Input", &f, 0.1f);
-        ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
-        ImGui::EndMenu();
-    }
+    if (ImGui::MenuItem("Quit", "Alt+F4")) { exit(0); }
+}
 
-    if (ImGui::BeginMenu("Colors"))
+void ImGuiDataContext::ShowMenuOptions()
+{
+    ImGui::MenuItem("Actions", nullptr, false, false);
+    if (ImGui::MenuItem("Toggle Clock", "Ctrl+K"))
     {
-        float sz = ImGui::GetTextLineHeight();
-        for (int i = 0; i < ImGuiCol_COUNT; i++)
-        {
-            const char* name = ImGui::GetStyleColorName((ImGuiCol)i);
-            ImVec2 p = ImGui::GetCursorScreenPos();
-            ImGui::GetWindowDrawList()->AddRectFilled(p, ImVec2(p.x + sz, p.y + sz), ImGui::GetColorU32((ImGuiCol)i));
-            ImGui::Dummy(ImVec2(sz, sz));
-            ImGui::SameLine();
-            ImGui::MenuItem(name);
-        }
-        ImGui::EndMenu();
+        // toggle clock
     }
-
-    // Here we demonstrate appending again to the "Options" menu (which we already created above)
-    // Of course in this demo it is a little bit silly that this function calls BeginMenu("Options") twice.
-    // In a real code-base using it would make senses to use this feature from very different code locations.
-    if (ImGui::BeginMenu("Options")) // <-- Append!
+    if (ImGui::MenuItem("Pulse Clock", "Ctrl+J"))
     {
-        static bool b = true;
-        ImGui::Checkbox("SomeOption", &b);
-        ImGui::EndMenu();
+	    // pulse clock
     }
-
-    if (ImGui::BeginMenu("Disabled", false)) // Disabled
-    {
-        IM_ASSERT(0);
-    }
-    if (ImGui::MenuItem("Checked", NULL, true)) {}
-    ImGui::Separator();
-    if (ImGui::MenuItem("Quit", "Alt+F4")) {}
 }

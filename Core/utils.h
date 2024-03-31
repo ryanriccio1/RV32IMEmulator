@@ -61,6 +61,18 @@ namespace RISCV
 			OutputPin<bit_width> data_out;
 		};
 
+		template <size_t control_bits>
+		class Decoder
+		{
+		public:
+			Decoder();
+			InputPin<1> enable;
+			InputPin<control_bits> select;
+			array<OutputPin<1>, 1 << control_bits> data_out;
+		private:
+			void zero_output();
+		};
+
 		template <size_t bit_width_in, size_t starting_bit, size_t ending_bit>
 		class Splitter
 		{
@@ -201,6 +213,34 @@ namespace RISCV
 				};
 			select.set_data(0);
 
+		}
+
+		template <size_t control_bits>
+		Decoder<control_bits>::Decoder()
+		{
+			enable.on_state_change = [this](bitset<1> new_data)
+				{
+					if (new_data == 0)
+						zero_output();
+					if (new_data == 1)
+						select.set_data(select.get_data());
+				};
+
+			select.on_state_change = [this](bitset<control_bits> new_data)
+				{
+					if (enable.get_data() == 1)
+						data_out[exp(2, new_data)].set_data(1);
+				};
+			select.set_data(0);
+		}
+
+		template <size_t control_bits>
+		void Decoder<control_bits>::zero_output()
+		{
+			for (auto output : data_out)
+			{
+				output.set_data(0);
+			}
 		}
 
 		template <size_t bit_width_in, size_t starting_bit, size_t ending_bit>

@@ -106,7 +106,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>..\SDL\include;..\imgui;..\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\ImGuiFileDialog;..\SDL\include;..\imgui;..\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
@@ -126,7 +126,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>..\SDL\include;..\imgui;..\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\ImGuiFileDialog;..\SDL\include;..\imgui;..\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,6 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\ImGuiFileDialog\ImGuiFileDialog.cpp" />
     <ClCompile Include="..\imgui\backends\imgui_impl_sdl3.cpp" />
     <ClCompile Include="..\imgui\backends\imgui_impl_sdlrenderer3.cpp" />
     <ClCompile Include="..\imgui\imgui.cpp" />
@@ -149,6 +150,8 @@
     <ClCompile Include="App.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\ImGuiFileDialog\ImGuiFileDialog.h" />
+    <ClInclude Include="..\ImGuiFileDialog\ImGuiFileDialogConfig.h" />
     <ClInclude Include="..\imgui\backends\imgui_impl_sdl3.h" />
     <ClInclude Include="..\imgui\backends\imgui_impl_sdlrenderer3.h" />
     <ClInclude Include="..\imgui\imconfig.h" />
@@ -239,6 +242,11 @@
     <ClInclude Include="..\SDL\include\SDL3\SDL_vulkan.h" />
     <ClInclude Include="ConsolaTTF.h" />
     <ClInclude Include="ImGuiDataContext.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Computer\Computer.vcxproj">
+      <Project>{2db6bb60-29ec-49b8-a8ef-91e3053981ca}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

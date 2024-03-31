@@ -31,6 +31,7 @@ namespace RISCV
 		CoreUtils::OutputPin<1> memory_read_en;
 		CoreUtils::OutputPin<1> memory_write_en;
 
+		void reset_all();
 		//const vector<CoreUtils::Register<bit_width>>& register_reader;	// for debugging
 
 
@@ -87,7 +88,7 @@ namespace RISCV
 				PC.clock.set_data(new_data);
 			else if (new_data == 0)
 				first_clock_cycle = false;
-			// irq_control.clock.set_data(new_data);
+			irq_control.clock.set_data(new_data);
 		};
 		reset.on_state_change = [this](bitset<1> new_data)
 		{
@@ -401,4 +402,12 @@ namespace RISCV
 			forward_control.data_wb.set_data(new_data);
 		};
 	}
+
+	template <size_t bit_width>
+	void Core<bit_width>::reset_all()
+	{
+		reset.set_data(1);
+		reset.set_data(0);
+	}
+
 }

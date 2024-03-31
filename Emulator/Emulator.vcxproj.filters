@@ -57,6 +57,9 @@
     <ClCompile Include="ImGuiDataContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\ImGuiFileDialog\ImGuiFileDialog.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\imgui\imconfig.h">
@@ -328,6 +331,12 @@
     </ClInclude>
     <ClInclude Include="ConsolaTTF.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ImGuiFileDialog\ImGuiFileDialog.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ImGuiFileDialog\ImGuiFileDialogConfig.h">
+      <Filter>Header Files\imgui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

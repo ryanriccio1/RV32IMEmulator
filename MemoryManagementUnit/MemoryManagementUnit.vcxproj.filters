@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="computer.h">
+    <ClInclude Include="memory_mangement_unit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
