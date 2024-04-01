@@ -18,6 +18,36 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="alu.h" />
+    <ClInclude Include="branch.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="core.h" />
+    <ClInclude Include="decode.h" />
+    <ClInclude Include="execute.h" />
+    <ClInclude Include="fetch.h" />
+    <ClInclude Include="instruction.h" />
+    <ClInclude Include="memory.h" />
+    <ClInclude Include="register.h" />
+    <ClInclude Include="register_file.h" />
+    <ClInclude Include="base_stage.h" />
+    <ClInclude Include="unified_memory.h" />
+    <ClInclude Include="write_back.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="alu.cpp" />
+    <ClCompile Include="branch.cpp" />
+    <ClCompile Include="common.cpp" />
+    <ClCompile Include="core.cpp" />
+    <ClCompile Include="decode.cpp" />
+    <ClCompile Include="driver.cpp" />
+    <ClCompile Include="execute.cpp" />
+    <ClCompile Include="fetch.cpp" />
+    <ClCompile Include="instruction.cpp" />
+    <ClCompile Include="memory.cpp" />
+    <ClCompile Include="register_file.cpp" />
+    <ClCompile Include="write_back.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -131,22 +161,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="alu.h" />
-    <ClInclude Include="alu_src.h" />
-    <ClInclude Include="branch.h" />
-    <ClInclude Include="control_logic.h" />
-    <ClInclude Include="core.h" />
-    <ClInclude Include="forward_control.h" />
-    <ClInclude Include="hazard_control.h" />
-    <ClInclude Include="immediate_decode.h" />
-    <ClInclude Include="irq.h" />
-    <ClInclude Include="mem_align.h" />
-    <ClInclude Include="pipeline_registers.h" />
-    <ClInclude Include="program_counter.h" />
-    <ClInclude Include="registers.h" />
-    <ClInclude Include="utils.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -13,49 +13,93 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\stages">
+      <UniqueIdentifier>{f329e3b9-c2a5-4ced-985b-b171675c730c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\stages">
+      <UniqueIdentifier>{35c44098-166d-4507-b88d-4fefd1f79250}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="fetch.h">
+      <Filter>Header Files\stages</Filter>
+    </ClInclude>
+    <ClInclude Include="decode.h">
+      <Filter>Header Files\stages</Filter>
+    </ClInclude>
+    <ClInclude Include="execute.h">
+      <Filter>Header Files\stages</Filter>
+    </ClInclude>
+    <ClInclude Include="memory.h">
+      <Filter>Header Files\stages</Filter>
+    </ClInclude>
+    <ClInclude Include="write_back.h">
+      <Filter>Header Files\stages</Filter>
+    </ClInclude>
+    <ClInclude Include="base_stage.h">
+      <Filter>Header Files\stages</Filter>
+    </ClInclude>
     <ClInclude Include="core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils.h">
+    <ClInclude Include="register.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="program_counter.h">
+    <ClInclude Include="register_file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pipeline_registers.h">
+    <ClInclude Include="instruction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="registers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="immediate_decode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="control_logic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mem_align.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="alu_src.h">
+    <ClInclude Include="unified_memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="branch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="hazard_control.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="forward_control.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="alu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="irq.h">
+    <ClInclude Include="common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="decode.cpp">
+      <Filter>Source Files\stages</Filter>
+    </ClCompile>
+    <ClCompile Include="execute.cpp">
+      <Filter>Source Files\stages</Filter>
+    </ClCompile>
+    <ClCompile Include="fetch.cpp">
+      <Filter>Source Files\stages</Filter>
+    </ClCompile>
+    <ClCompile Include="memory.cpp">
+      <Filter>Source Files\stages</Filter>
+    </ClCompile>
+    <ClCompile Include="write_back.cpp">
+      <Filter>Source Files\stages</Filter>
+    </ClCompile>
+    <ClCompile Include="core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="instruction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="driver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="branch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="alu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="register_file.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
