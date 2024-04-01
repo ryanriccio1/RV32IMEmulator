@@ -8,7 +8,9 @@
 int main()
 {
     using namespace std;
-    const auto file_contents = shared_ptr<uint8_t[]>(new uint8_t[0x100000]);
+
+    //cout << "hello my name is" << "\b \b" << '\n';
+	const auto file_contents = shared_ptr<uint8_t[]>(new uint8_t[0x100000]);
 
     ifstream file(R"(C:\Users\rshar\Desktop\Projects\School\SeniorProject\Logisim\test_prg.bin)", std::ios::binary);
     file.seekg(0, std::ios::end);
@@ -24,7 +26,7 @@ int main()
 
     int counter = 0;
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    for (size_t idx = 0; idx < 10000000; idx++)
+    for (size_t idx = 0; idx < 1000000; idx++)
     {
         core.clock();
     }
@@ -35,7 +37,7 @@ int main()
     //{
     //    cout << format("\r{:#010x}", core.get_PC());
     //    //counter = core.get_PC();
-    //    //core.clock();
+    //    core.clock();
     //}
 	return EXIT_SUCCESS;
 }

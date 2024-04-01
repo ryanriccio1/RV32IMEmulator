@@ -4,12 +4,16 @@
 #include "fetch.h"
 #include "memory.h"
 #include "write_back.h"
+#include "core.h"
 
 namespace RV32IM
 {
 	namespace Stage
 	{
-		Decode::Decode(Core* main_core): BaseStage(main_core), bubble(false), hazard(false)	{}
+		Decode::Decode(Core* main_core): BaseStage(main_core), bubble(false), hazard(false), irq_counter(0),
+		                                 irq_return_address(0)
+		{
+		}
 
 		void Decode::clock()
 		{
@@ -22,6 +26,24 @@ namespace RV32IM
 
 		void Decode::run()
 		{
+			bool irq_jump = false;
+			if (irq_counter > 0)
+			{
+				irq_counter--;
+				if (irq_counter == 0)
+				{
+					reg_instruction = InstructionI(0x10000267);
+					reg_PC = irq_return_address - 4;
+					irq_jump = true;
+				}
+				else
+				{
+					reg_instruction = InstructionNOP();
+					return;
+				}
+				
+			}
+
 			// if bubble is requested from other stage
 			// or from this stage on a previous clock
 			// insert NOP
@@ -32,12 +54,20 @@ namespace RV32IM
 			}
 
 			// get data from previous stage
-			reg_instruction = core->fetch->reg_instruction.read();
-			reg_PC = core->fetch->reg_PC.read();
+			Instruction instruction;
+			if (!irq_jump)
+			{
+				instruction = core->fetch->reg_instruction;
+				reg_instruction = instruction;
+				reg_PC = core->fetch->reg_PC.read();
+			}
+			else
+			{
+				instruction = reg_instruction.get_input();
+			}
 			reg_predicted_PC = core->fetch->reg_predicted_PC.read();
 			hazard = false;
 
-			const Instruction instruction = core->fetch->reg_instruction;
 
 			bool forward;
 			unsigned_data forward_data;
@@ -54,7 +84,7 @@ namespace RV32IM
 				}
 				else
 				{
-					reg_value = core->register_file.read(instruction.rs1);
+					reg_value = core->register_file->read(instruction.rs1);
 				}
 				reg_rs1 = reg_value;
 			}
@@ -70,7 +100,7 @@ namespace RV32IM
 				}
 				else
 				{
-					reg_value = core->register_file.read(instruction.rs2);
+					reg_value = core->register_file->read(instruction.rs2);
 				}
 				reg_rs2 = reg_value;
 			}
@@ -93,6 +123,12 @@ namespace RV32IM
 			reg_rs2.set_write_enable(!stall);
 			reg_PC.set_write_enable(!stall);
 			reg_predicted_PC.set_write_enable(!stall);
+		}
+
+		void Decode::irq()
+		{
+			irq_counter = 5;
+			irq_return_address = reg_PC;
 		}
 
 		bool Decode::detect_hazard(const unsigned_data reg, bool& forward, unsigned_data& forward_data) const

@@ -1,5 +1,7 @@
 #include "fetch.h"
 
+#include "core.h"
+
 namespace RV32IM
 {
 	namespace Stage
@@ -27,12 +29,12 @@ namespace RV32IM
 			reg_PC = temp_PC;
 			reg_predicted_PC = temp_PC + 4;
 
-			const auto current_instruction = parse_instruction(core->memory.read_word(temp_PC));
+			const auto current_instruction = parse_instruction(core->memory->read_word(temp_PC));
 
 			// if new instruction is a branch, ask BranchPredictor for a prediction
 			if (current_instruction.opcode == Opcodes::BXX)
 			{
-				if (core->branch.take_branch(temp_PC))
+				if (core->branch->take_branch(temp_PC))
 					reg_predicted_PC = temp_PC + current_instruction.immediate;
 			}
 

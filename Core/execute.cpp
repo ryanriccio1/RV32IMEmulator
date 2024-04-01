@@ -3,6 +3,7 @@
 #include "alu.h"
 #include "decode.h"
 #include "fetch.h"
+#include "core.h"
 
 namespace RV32IM
 {
@@ -50,7 +51,7 @@ namespace RV32IM
 			}
 			// if branch instruction, a branch only occurs if the next PC != pc + 4
 			if (instruction.opcode == Opcodes::BXX)
-				core->branch.update_table(pc, next_pc != pc + 4); // keep record of branch for current address
+				core->branch->update_table(pc, next_pc != pc + 4); // keep record of branch for current address
 
 			if (invalid_prediction)
 			{

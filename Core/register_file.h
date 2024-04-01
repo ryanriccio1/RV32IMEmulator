@@ -11,8 +11,8 @@ namespace RV32IM
 		static constexpr size_t NUM_REGISTERS = 32;
 		RegisterFile() = default;
 
-		unsigned_data read(size_t idx) const;
-		void write(size_t idx, unsigned_data value);
+		unsigned_data read(RegisterName reg) const;
+		void write(RegisterName reg, unsigned_data value);
 
 		void clock();
 

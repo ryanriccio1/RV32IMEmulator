@@ -8,9 +8,9 @@ namespace RV32IM
 		Instruction();
 		Instruction(const inst_data& instruction_data);
 		Opcodes opcode;
-		unsigned_data rs1;
-		unsigned_data rs2;
-		unsigned_data rd;
+		RegisterName rs1;
+		RegisterName rs2;
+		RegisterName rd;
 		Funct3 funct3;
 		Funct7 funct7;
 		unsigned_data immediate;

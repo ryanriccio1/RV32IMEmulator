@@ -2,14 +2,14 @@
 
 namespace RV32IM
 {
-	unsigned_data RegisterFile::read(const size_t idx) const
+	unsigned_data RegisterFile::read(const RegisterName reg) const
 	{
-		return idx == 0 ? 0 : outputs[idx];
+		return reg == 0 ? 0 : outputs[reg];
 	}
 
-	auto RegisterFile::write(const size_t idx, unsigned_data value) -> void
+	auto RegisterFile::write(const RegisterName reg, const unsigned_data value) -> void
 	{
-		inputs[idx] = value;
+		inputs[reg] = value;
 	}
 
 	void RegisterFile::clock()

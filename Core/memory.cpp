@@ -1,6 +1,7 @@
 #include "memory.h"
 
 #include "execute.h"
+#include "core.h"
 
 namespace RV32IM
 {
@@ -32,13 +33,13 @@ namespace RV32IM
 				switch (instruction.funct3)
 				{
 				case SW:
-					core->memory.write_word(alu_result, rs2);
+					core->memory->write_word(alu_result, rs2);
 					break;
 				case SH:
-					core->memory.write_half_word(alu_result, static_cast<uint16_t>(rs2));
+					core->memory->write_half_word(alu_result, static_cast<uint16_t>(rs2));
 					break;
 				case SB:
-					core->memory.write_byte(alu_result, static_cast<uint8_t>(rs2));
+					core->memory->write_byte(alu_result, static_cast<uint8_t>(rs2));
 					break;
 				default:
 					break;
@@ -51,19 +52,19 @@ namespace RV32IM
 				switch (instruction.funct3)
 				{
 				case LB:
-					memory_in = static_cast<int8_t>(core->memory.read_byte(alu_result));
+					memory_in = static_cast<int8_t>(core->memory->read_byte(alu_result));
 					break;
 				case LH:
-					memory_in = static_cast<int16_t>(core->memory.read_half_word(alu_result));
+					memory_in = static_cast<int16_t>(core->memory->read_half_word(alu_result));
 					break;
 				case LW:
-					memory_in = core->memory.read_word(alu_result);
+					memory_in = core->memory->read_word(alu_result);
 					break;
 				case LBU:
-					memory_in = core->memory.read_byte(alu_result);
+					memory_in = core->memory->read_byte(alu_result);
 					break;
 				case LHU:
-					memory_in = core->memory.read_half_word(alu_result);
+					memory_in = core->memory->read_half_word(alu_result);
 					break;
 				default:
 					memory_in = 0xFFFFFFFF;

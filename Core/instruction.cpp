@@ -4,7 +4,7 @@ namespace RV32IM
 {
 	Instruction::Instruction() : Instruction(0x00000013) {}
 
-	Instruction::Instruction(const inst_data& instruction_data): opcode(RI), rs1(0), rs2(0), rd(0), funct3(), funct7(),
+	Instruction::Instruction(const inst_data& instruction_data): opcode(RI), rs1(zero), rs2(zero), rd(zero), funct3(), funct7(),
 	                                                             immediate(0),
 	                                                             inst(instruction_data),
 	                                                             type()
@@ -29,10 +29,10 @@ namespace RV32IM
 	InstructionR::InstructionR(const inst_data& instruction_data)
 	{
 		opcode = static_cast<Opcodes>(mask_data(instruction_data, 0, 6));
-		rd = mask_data(instruction_data, 7, 11);
+		rd = static_cast<RegisterName>(mask_data(instruction_data, 7, 11));
 		funct3 = static_cast<Funct3>(mask_data(instruction_data, 12, 14));
-		rs1 = mask_data(instruction_data, 15, 19);
-		rs2 = mask_data(instruction_data, 20, 24);
+		rs1 = static_cast<RegisterName>(mask_data(instruction_data, 15, 19));
+		rs2 = static_cast<RegisterName>(mask_data(instruction_data, 20, 24));
 		funct7 = static_cast<Funct7>(mask_data(instruction_data, 25, 31));
 		type = InstructionFormat::R;
 		inst = instruction_data;
@@ -41,9 +41,9 @@ namespace RV32IM
 	InstructionI::InstructionI(const inst_data& instruction_data)
 	{
 		opcode = static_cast<Opcodes>(mask_data(instruction_data, 0, 6));
-		rd = mask_data(instruction_data, 7, 11);
+		rd = static_cast<RegisterName>(mask_data(instruction_data, 7, 11));
 		funct3 = static_cast<Funct3>(mask_data(instruction_data, 12, 14));
-		rs1 = mask_data(instruction_data, 15, 19);
+		rs1 = static_cast<RegisterName>(mask_data(instruction_data, 15, 19));
 		immediate = mask_data(instruction_data, 20, 30) | 
 					sign_extend(mask_data(instruction_data, 31, 31), 11);
 		type = InstructionFormat::I;
@@ -54,8 +54,8 @@ namespace RV32IM
 	{
 		opcode = static_cast<Opcodes>(mask_data(instruction_data, 0, 6));
 		funct3 = static_cast<Funct3>(mask_data(instruction_data, 12, 14));
-		rs1 = mask_data(instruction_data, 15, 19);
-		rs2 = mask_data(instruction_data, 20, 24);
+		rs1 = static_cast<RegisterName>(mask_data(instruction_data, 15, 19));
+		rs2 = static_cast<RegisterName>(mask_data(instruction_data, 20, 24));
 		immediate = mask_data(instruction_data, 7, 11) |
 					mask_data(instruction_data, 25, 30) << 5 |
 					sign_extend(mask_data(instruction_data, 31, 31), 11);
@@ -67,8 +67,8 @@ namespace RV32IM
 	{
 		opcode = static_cast<Opcodes>(mask_data(instruction_data, 0, 6));
 		funct3 = static_cast<Funct3>(mask_data(instruction_data, 12, 14));
-		rs1 = mask_data(instruction_data, 15, 19);
-		rs2 = mask_data(instruction_data, 20, 24);
+		rs1 = static_cast<RegisterName>(mask_data(instruction_data, 15, 19));
+		rs2 = static_cast<RegisterName>(mask_data(instruction_data, 20, 24));
 		immediate = mask_data(instruction_data, 8, 11) << 1 |
 					mask_data(instruction_data, 25, 30) << 5 |
 					mask_data(instruction_data, 7, 7) << 11 |
@@ -80,7 +80,7 @@ namespace RV32IM
 	InstructionU::InstructionU(const inst_data& instruction_data)
 	{
 		opcode = static_cast<Opcodes>(mask_data(instruction_data, 0, 6));
-		rd = mask_data(instruction_data, 7, 11);
+		rd = static_cast<RegisterName>(mask_data(instruction_data, 7, 11));
 		immediate = mask_data(instruction_data, 12, 19) << 12 |
 					mask_data(instruction_data, 20, 30) << 20 |
 					mask_data(instruction_data, 31, 31) << 31;
@@ -91,7 +91,7 @@ namespace RV32IM
 	InstructionJ::InstructionJ(const inst_data& instruction_data)
 	{
 		opcode = static_cast<Opcodes>(mask_data(instruction_data, 0, 6));
-		rd = mask_data(instruction_data, 7, 11);
+		rd = static_cast<RegisterName>(mask_data(instruction_data, 7, 11));
 		immediate = mask_data(instruction_data, 21, 30) << 1 |
 					mask_data(instruction_data, 20, 20) << 11 |
 					mask_data(instruction_data, 12, 19) << 12 |

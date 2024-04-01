@@ -21,6 +21,7 @@ namespace RV32IM
 			void run() override;
 			void insert_bubble(bool bubble);
 			void stall(bool stall);
+			void irq();
 
 		private:
 			Register<Instruction> reg_instruction;
@@ -32,6 +33,8 @@ namespace RV32IM
 			bool detect_hazard(unsigned_data reg, bool& forward, unsigned_data& forward_data) const;
 			bool bubble;
 			bool hazard;
+			size_t irq_counter;
+			unsigned_data irq_return_address;
 		};
 	}
 }

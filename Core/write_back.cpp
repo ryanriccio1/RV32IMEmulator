@@ -1,6 +1,7 @@
 #include "write_back.h"
 
 #include "memory.h"
+#include "core.h"
 
 namespace RV32IM
 {
@@ -37,7 +38,7 @@ namespace RV32IM
 				write_back_value = 0xFFFFFFFF;
 				break;
 			}
-			core->register_file.write(instruction.rd, write_back_value);
+			core->register_file->write(instruction.rd, write_back_value);
 			reg_wb_value = write_back_value;
 		}
 	}
