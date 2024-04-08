@@ -7,16 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Emulator", "Emulator\Emulat
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "Core\Core.vcxproj", "{D6DDF5BE-1FD0-414B-B3C3-F06753A687F9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Memory", "Memory\Memory.vcxproj", "{A6462D63-A03A-47E2-BEB8-02001930DDB0}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Computer", "Computer\Computer.vcxproj", "{2DB6BB60-29EC-49B8-A8EF-91E3053981CA}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PeripheralInterfaceAdapter", "PeripheralInterfaceAdapter\PeripheralInterfaceAdapter.vcxproj", "{05652190-77BD-461A-AE54-36D1D6D9FDEB}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MemoryManagementUnit", "MemoryManagementUnit\MemoryManagementUnit.vcxproj", "{9D6DAFC1-8655-4BE9-9427-3393A484CA0A}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VideoInterface", "VideoInterface\VideoInterface.vcxproj", "{32C31116-21C0-4222-B589-FFDF80E4A862}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,46 +31,6 @@ Global
 		{D6DDF5BE-1FD0-414B-B3C3-F06753A687F9}.Release|x64.Build.0 = Release|x64
 		{D6DDF5BE-1FD0-414B-B3C3-F06753A687F9}.Release|x86.ActiveCfg = Release|Win32
 		{D6DDF5BE-1FD0-414B-B3C3-F06753A687F9}.Release|x86.Build.0 = Release|Win32
-		{A6462D63-A03A-47E2-BEB8-02001930DDB0}.Debug|x64.ActiveCfg = Debug|x64
-		{A6462D63-A03A-47E2-BEB8-02001930DDB0}.Debug|x64.Build.0 = Debug|x64
-		{A6462D63-A03A-47E2-BEB8-02001930DDB0}.Debug|x86.ActiveCfg = Debug|Win32
-		{A6462D63-A03A-47E2-BEB8-02001930DDB0}.Debug|x86.Build.0 = Debug|Win32
-		{A6462D63-A03A-47E2-BEB8-02001930DDB0}.Release|x64.ActiveCfg = Release|x64
-		{A6462D63-A03A-47E2-BEB8-02001930DDB0}.Release|x64.Build.0 = Release|x64
-		{A6462D63-A03A-47E2-BEB8-02001930DDB0}.Release|x86.ActiveCfg = Release|Win32
-		{A6462D63-A03A-47E2-BEB8-02001930DDB0}.Release|x86.Build.0 = Release|Win32
-		{2DB6BB60-29EC-49B8-A8EF-91E3053981CA}.Debug|x64.ActiveCfg = Debug|x64
-		{2DB6BB60-29EC-49B8-A8EF-91E3053981CA}.Debug|x64.Build.0 = Debug|x64
-		{2DB6BB60-29EC-49B8-A8EF-91E3053981CA}.Debug|x86.ActiveCfg = Debug|Win32
-		{2DB6BB60-29EC-49B8-A8EF-91E3053981CA}.Debug|x86.Build.0 = Debug|Win32
-		{2DB6BB60-29EC-49B8-A8EF-91E3053981CA}.Release|x64.ActiveCfg = Release|x64
-		{2DB6BB60-29EC-49B8-A8EF-91E3053981CA}.Release|x64.Build.0 = Release|x64
-		{2DB6BB60-29EC-49B8-A8EF-91E3053981CA}.Release|x86.ActiveCfg = Release|Win32
-		{2DB6BB60-29EC-49B8-A8EF-91E3053981CA}.Release|x86.Build.0 = Release|Win32
-		{05652190-77BD-461A-AE54-36D1D6D9FDEB}.Debug|x64.ActiveCfg = Debug|x64
-		{05652190-77BD-461A-AE54-36D1D6D9FDEB}.Debug|x64.Build.0 = Debug|x64
-		{05652190-77BD-461A-AE54-36D1D6D9FDEB}.Debug|x86.ActiveCfg = Debug|Win32
-		{05652190-77BD-461A-AE54-36D1D6D9FDEB}.Debug|x86.Build.0 = Debug|Win32
-		{05652190-77BD-461A-AE54-36D1D6D9FDEB}.Release|x64.ActiveCfg = Release|x64
-		{05652190-77BD-461A-AE54-36D1D6D9FDEB}.Release|x64.Build.0 = Release|x64
-		{05652190-77BD-461A-AE54-36D1D6D9FDEB}.Release|x86.ActiveCfg = Release|Win32
-		{05652190-77BD-461A-AE54-36D1D6D9FDEB}.Release|x86.Build.0 = Release|Win32
-		{9D6DAFC1-8655-4BE9-9427-3393A484CA0A}.Debug|x64.ActiveCfg = Debug|x64
-		{9D6DAFC1-8655-4BE9-9427-3393A484CA0A}.Debug|x64.Build.0 = Debug|x64
-		{9D6DAFC1-8655-4BE9-9427-3393A484CA0A}.Debug|x86.ActiveCfg = Debug|Win32
-		{9D6DAFC1-8655-4BE9-9427-3393A484CA0A}.Debug|x86.Build.0 = Debug|Win32
-		{9D6DAFC1-8655-4BE9-9427-3393A484CA0A}.Release|x64.ActiveCfg = Release|x64
-		{9D6DAFC1-8655-4BE9-9427-3393A484CA0A}.Release|x64.Build.0 = Release|x64
-		{9D6DAFC1-8655-4BE9-9427-3393A484CA0A}.Release|x86.ActiveCfg = Release|Win32
-		{9D6DAFC1-8655-4BE9-9427-3393A484CA0A}.Release|x86.Build.0 = Release|Win32
-		{32C31116-21C0-4222-B589-FFDF80E4A862}.Debug|x64.ActiveCfg = Debug|x64
-		{32C31116-21C0-4222-B589-FFDF80E4A862}.Debug|x64.Build.0 = Debug|x64
-		{32C31116-21C0-4222-B589-FFDF80E4A862}.Debug|x86.ActiveCfg = Debug|Win32
-		{32C31116-21C0-4222-B589-FFDF80E4A862}.Debug|x86.Build.0 = Debug|Win32
-		{32C31116-21C0-4222-B589-FFDF80E4A862}.Release|x64.ActiveCfg = Release|x64
-		{32C31116-21C0-4222-B589-FFDF80E4A862}.Release|x64.Build.0 = Release|x64
-		{32C31116-21C0-4222-B589-FFDF80E4A862}.Release|x86.ActiveCfg = Release|Win32
-		{32C31116-21C0-4222-B589-FFDF80E4A862}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

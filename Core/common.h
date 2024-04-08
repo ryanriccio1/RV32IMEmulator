@@ -9,6 +9,20 @@ namespace RV32IM
 	using signed_data = int32_t;
 	using inst_data = uint32_t;
 
+	static constexpr unsigned_data vga_mode = 0xFFF00;
+	static constexpr unsigned_data vga_mem_ptr = 0xFFF04;
+	static constexpr unsigned_data col_mem_ptr = 0xFFF08;
+	static constexpr unsigned_data chr_mem_ptr = 0xFFF0C;
+
+	static constexpr unsigned_data irq_mask = 0xFFFF0;
+	static constexpr unsigned_data timer_in = 0xFFFF1;
+	static constexpr unsigned_data keyboard_in = 0xFFFF2;
+	static constexpr unsigned_data uart_tx = 0xFFFF3;
+	static constexpr unsigned_data uart_rx = 0xFFFF4;
+	static constexpr unsigned_data irq_en = 0xFFFF5;
+	static constexpr unsigned_data irq_handle = 0xFFFF6;
+	static constexpr unsigned_data irq_vector = 0xFFFF7;
+
 	enum Opcodes
 	{
 		LUI = 0b0110111,
@@ -69,6 +83,16 @@ namespace RV32IM
 	{
 		zero, ra, sp, gp, tp, t0, t1, t2, s0, s1, a0, a1, a2, a3, a4, a5,
 		a6, a7, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, t3, t4, t5, t6
+	};
+
+	enum IRQType
+	{
+		KEYBOARD = 1, UART_RX = 2, TIMER = 4
+	};
+
+	enum VideoModes
+	{
+		BITMAP, CHARACTER
 	};
 
 	enum class InstructionFormat { R, I, S, B, U, J };

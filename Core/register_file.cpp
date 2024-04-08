@@ -16,4 +16,9 @@ namespace RV32IM
 	{
 		ranges::copy(inputs, outputs.begin());
 	}
+
+	array<unsigned_data, RegisterFile::NUM_REGISTERS>& RegisterFile::get_registers()
+	{
+		return outputs;
+	}
 }

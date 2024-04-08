@@ -12,7 +12,7 @@
 #include <ImGuiFileDialog.h>
 
 #include "ConsolaTTF.h"
-#include "../Computer/computer.h"
+#include "../Core/core.h"
 
 using namespace std;
 
@@ -21,7 +21,7 @@ enum class CurrentWindow { Emulator, Console, Registers, Memory, None };
 class ImGuiDataContext
 {
 public:
-	ImGuiDataContext(const string& window_name, Uint32 SDL_flags, Uint32 window_flags, Uint32 renderer_flags, ImGuiConfigFlags io_config_flags, int base_width, int base_height, shared_ptr<Computer::Computer>& computer);
+	ImGuiDataContext(const string& window_name, Uint32 SDL_flags, Uint32 window_flags, Uint32 renderer_flags, ImGuiConfigFlags io_config_flags, int base_width, int base_height, shared_ptr<RV32IM::Core>& core);
 	virtual ~ImGuiDataContext();
 
 	virtual void NewFrame();
@@ -43,7 +43,7 @@ private:
 	CurrentWindow current_window; 
 
 	SDL_Texture* emulator_screen;
-	shared_ptr<Computer::Computer> computer;
+	shared_ptr<RV32IM::Core> core;
 	shared_ptr<uint8_t[]> video_buffer;
 
 	void ReadFileToComputer(const string& filePathName) const;

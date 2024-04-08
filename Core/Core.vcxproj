@@ -28,10 +28,12 @@
     <ClInclude Include="fetch.h" />
     <ClInclude Include="instruction.h" />
     <ClInclude Include="memory.h" />
+    <ClInclude Include="moving_average.h" />
     <ClInclude Include="register.h" />
     <ClInclude Include="register_file.h" />
     <ClInclude Include="base_stage.h" />
     <ClInclude Include="unified_memory.h" />
+    <ClInclude Include="video_control.h" />
     <ClInclude Include="write_back.h" />
   </ItemGroup>
   <ItemGroup>
@@ -46,6 +48,7 @@
     <ClCompile Include="instruction.cpp" />
     <ClCompile Include="memory.cpp" />
     <ClCompile Include="register_file.cpp" />
+    <ClCompile Include="video_control.cpp" />
     <ClCompile Include="write_back.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -70,13 +73,13 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>

@@ -15,7 +15,7 @@ namespace RV32IM
 		void write(RegisterName reg, unsigned_data value);
 
 		void clock();
-
+		array<unsigned_data, NUM_REGISTERS>& get_registers();
 	private:
 		array<unsigned_data, NUM_REGISTERS> inputs;
 		array<unsigned_data, NUM_REGISTERS> outputs;

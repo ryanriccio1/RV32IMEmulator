@@ -2,12 +2,12 @@
 
 using namespace std;
 ImGuiDataContext::ImGuiDataContext(const string& window_name, Uint32 SDL_flags, Uint32 window_flags, Uint32 renderer_flags,
-                                   ImGuiConfigFlags io_config_flags, int base_width, int base_height, shared_ptr<Computer::Computer>& computer) :
+                                   ImGuiConfigFlags io_config_flags, int base_width, int base_height, shared_ptr<RV32IM::Core>& core) :
 	io{(ImGui::CreateContext(), ImGui::GetIO())},
 	style{ImGui::GetStyle()},
 	base_width{base_width},
 	base_height{base_height},
-	computer{computer}
+	core{core}
 {
     // Setup SDL
     if (SDL_Init(SDL_flags) != 0)
@@ -113,23 +113,23 @@ SDL_WindowID ImGuiDataContext::GetWindowID() const
 
 void ImGuiDataContext::ReadFileToComputer(const string& filePathName) const
 {
-    auto file_contents = shared_ptr<uint8_t[]>(new uint8_t[computer->get_memory_size()]);
+    auto file_contents = shared_ptr<uint8_t[]>(new uint8_t[core->get_memory_size()]);
 
 	ifstream file(filePathName, std::ios::binary);
     file.seekg(0, std::ios::end);
     const streamsize size = file.tellg();
     file.seekg(0, std::ios::beg);
 
-    memset(file_contents.get(), 0, computer->get_memory_size());
-    file.read(reinterpret_cast<char*>(file_contents.get()), min(size, static_cast<streamsize>(computer->get_memory_size())));
+    memset(file_contents.get(), 0, core->get_memory_size());
+    file.read(reinterpret_cast<char*>(file_contents.get()), min(size, static_cast<streamsize>(core->get_memory_size())));
     file.close();
 
-    computer->load_memory_contents(file_contents);
+    core->load_memory_contents(file_contents);
 }
 
 void ImGuiDataContext::UpdateVideoBufferPointer()
 {
-    video_buffer = computer->get_video_memory();
+    video_buffer = core->get_video_memory();
 }
 
 void ImGuiDataContext::SetWindowSize(const float& width, const float& height, const int pos_x, const int pos_y) const
@@ -143,7 +143,7 @@ void ImGuiDataContext::SetWindowSize(const float& width, const float& height, co
 void ImGuiDataContext::Update()
 {
 	ImGui::BeginMainMenuBar();
-    computer->video_interface->update_memory();
+    //computer->video_interface->update_memory();
     if (ImGui::BeginMenu("File"))
     {
         ShowMenuFile();
@@ -164,9 +164,9 @@ void ImGuiDataContext::Update()
     {
         current_window = CurrentWindow::Emulator;
     }
-	SDL_UpdateTexture(emulator_screen, nullptr, computer->get_video_memory().get(), computer->get_video_width() * 4);
+	SDL_UpdateTexture(emulator_screen, nullptr, core->get_video_memory().get(), core->get_video_width() * 4);
 
-    ImGui::Image(emulator_screen, ImVec2(computer->get_video_width() * 2 * dpi_scale,computer->get_video_height() * 2 * dpi_scale));
+    ImGui::Image(emulator_screen, ImVec2(core->get_video_width() * 2 * dpi_scale, core->get_video_height() * 2 * dpi_scale));
     ImGui::End();
 
     // Console
