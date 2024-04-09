@@ -133,7 +133,7 @@ namespace RV32IM
 							clock();
 
 						end = chrono::steady_clock::now();
-						moving_average.add_sample((end - start).count() >> 9);
+						moving_average.add_sample((end - start).count() >> 9);  // NOLINT(clang-diagnostic-shorten-64-to-32, bugprone-narrowing-conversions, cppcoreguidelines-narrowing-conversions)
 					}
 				});
 		}

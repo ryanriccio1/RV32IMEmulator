@@ -29,8 +29,7 @@ namespace RV32IM
 				{
 					while (!halt_drawing)
 					{
-						draw_bitmap();
-						/*switch (memory->read_byte(vga_mode))
+						switch (memory->read_byte(vga_mode))
 						{
 						default:
 						case BITMAP:
@@ -39,7 +38,7 @@ namespace RV32IM
 						case CHARACTER:
 							draw_character();
 							break;
-						}*/
+						}
 					}
 				});
 
@@ -62,7 +61,7 @@ namespace RV32IM
 		return video_memory;
 	}
 
-	void VideoInterface::draw_bitmap()
+	void VideoInterface::draw_bitmap() const
 	{
 		memcpy_s(video_memory.get(), video_memory_size, memory->get_memory_ptr().get() + get_video_memory_address(), video_memory_size);
 	}
@@ -76,17 +75,15 @@ namespace RV32IM
 
 		for (unsigned_data y{ 0 }; y < video_height; y++)
 		{
-			for (unsigned_data x{ 0 }; x < video_width / 8; x++)
+			for (unsigned_data x{ 0 }; x < video_width; x+=8)
 			{
-				const uint8_t select_character = memory->read_byte(video_mem_address + x + y * video_width);
-				const unsigned_data foreground = memory->read_word(color_mem_address + x * 8 + (y * video_width * 4 * 2));
-				const unsigned_data background = memory->read_word(color_mem_address + x * 8 + 4 + (y * video_width * 4 * 2));
-				const uint8_t character_mask = memory->read_byte(char_mem_address + select_character * 8 + y % 8);
+				const unsigned_data select_character = memory->read_word(video_mem_address + (x >> 1) + ((y >> 3) * (video_width >> 1)));
+				const unsigned_data foreground = memory->read_word(color_mem_address + x + video_width * (y >> 3));
+				const unsigned_data background = memory->read_word(color_mem_address + x + 4 + video_width * (y >> 3));
+				const uint8_t character_mask = memory->read_byte(char_mem_address + select_character * 8 + (7 - (y % 8)));
 
-				for (unsigned_data idx{ 0 }; idx < 8; idx++)
-				{
-					temp_buffer[y][x * 8 + idx] = ((character_mask >> (7 - idx)) & 0b00000001) == 1 ? background : foreground;
-				}
+				for (unsigned_data i{ 0 }; i < 8; i++)
+					temp_buffer[y][i + x] = ((character_mask >> (7 - i)) & 0b00000001) == 1 ? background : foreground;
 			}
 		}
 		ranges::copy(ranges::join_view(temp_buffer), reinterpret_cast<uint32_t*>(video_memory.get()));

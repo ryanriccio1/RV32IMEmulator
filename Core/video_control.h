@@ -18,14 +18,14 @@ namespace RV32IM
 		shared_ptr<uint8_t[]>& get_video_memory();
 
 	private:
-		void draw_bitmap();
+		void draw_bitmap() const;
 		void draw_character();
 
 		unsigned_data get_video_memory_address() const;
 		unsigned_data get_color_memory_address() const;
 		unsigned_data get_char_memory_address() const;
 
-		size_t video_memory_size;
+		const unsigned_data video_memory_size;
 		shared_ptr<UnifiedMemory> memory;
 		shared_ptr<uint8_t[]> video_memory;
 		vector<vector<uint32_t>> temp_buffer;
