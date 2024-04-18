@@ -13,7 +13,7 @@ namespace RV32IM
 		bool take_branch(unsigned_data address) const;
 		void update_table(unsigned_data address, bool branch_taken);
 	private:
-		unique_ptr<uint8_t[]> two_bits;
-		unique_ptr<uint8_t[]> mux;
+		unique_ptr<uint8_t[]> branch_status_table;
+		unique_ptr<uint8_t[]> branch_history_table;
 	};
 }

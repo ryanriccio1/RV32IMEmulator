@@ -1,7 +1,5 @@
 #include "core.h"
 
-#include <iostream>
-
 namespace RV32IM
 {
 	Core::Core() : Core(0x100000)	{}
@@ -10,7 +8,7 @@ namespace RV32IM
 	{
 	}
 
-	Core::Core(const size_t memory_size, const int time_per_clock, const unsigned_data video_width, const unsigned_data video_height) :
+	Core::Core(const size_t memory_size, const int time_per_clock, const int video_width, const int video_height) :
 		fetch(new Stage::Fetch(this)),
 		decode(new Stage::Decode(this)),
 		execute(new Stage::Execute(this)),
@@ -24,10 +22,10 @@ namespace RV32IM
 		video_height(video_height),
 		memory_size(memory_size),
 		block_irq(false),
-		start(),
+		clock_start(),
+		processing_start(),
 		end(),
 		desired_clock_time(time_per_clock),
-		average_clock_time(0),
 		halt_clock(true),
 		timer_counter(0),
 		stop_counter(true)
@@ -58,14 +56,24 @@ namespace RV32IM
 
 	void Core::get_irq_free() const
 	{
-		while (memory->read_byte(irq_handle) != 1) {}
+#ifndef _DEBUG
+		if (memory->read_byte(irq_en) == 1)
+			while (memory->read_byte(irq_handle) != 1) {}
+#endif
 	}
 
 	void Core::load_memory_contents(const shared_ptr<uint8_t[]>& new_memory)
 	{
-		reset();
+		bool restart_clock = false;
+		if (is_clock_running())
+			restart_clock = true;
+
+		stop_clock();
         memory->load_memory_contents(new_memory);
-		start_clock();
+		reset();
+
+		if (restart_clock)
+			start_clock();
 	}
 
 	void Core::set_desired_clock_time(const int time_per_clock)
@@ -88,12 +96,12 @@ namespace RV32IM
 		return memory_size;
 	}
 
-	size_t Core::get_video_width() const
+	int Core::get_video_width() const
 	{
 		return video_width;
 	}
 
-	size_t Core::get_video_height() const
+	int Core::get_video_height() const
 	{
 		return video_height;
 	}
@@ -123,17 +131,27 @@ namespace RV32IM
 				{
 					while (!halt_clock)
 					{
-						average_clock_time = moving_average.get_average();
+						clock_start = chrono::steady_clock::now();
 
 						if (desired_clock_time != 0)
-							this_thread::sleep_for(chrono::duration_cast<chrono::nanoseconds>(chrono::nanoseconds(desired_clock_time * 512 - average_clock_time * 512)));
+						{
+							this_thread::sleep_for(chrono::nanoseconds(desired_clock_time * 512 * 512 - average_processing.get_average() * 512 * 512));
+						}
+						for (size_t j{ 0 }; j < 512; j++)
+						{
+							processing_start = chrono::steady_clock::now();
+							for (size_t i{ 0 }; i < 512; i++)
+								clock();
 
-						start = chrono::steady_clock::now();
-						for (size_t i{ 0 }; i < 512; i++)
-							clock();
+							end = chrono::steady_clock::now();
 
-						end = chrono::steady_clock::now();
-						moving_average.add_sample((end - start).count() >> 9);  // NOLINT(clang-diagnostic-shorten-64-to-32, bugprone-narrowing-conversions, cppcoreguidelines-narrowing-conversions)
+							average_processing.add_sample((end - processing_start).count() >> 9);  // NOLINT(clang-diagnostic-shorten-64-to-32, bugprone-narrowing-conversions, cppcoreguidelines-narrowing-conversions)
+						}
+						if (memory->read_byte(irq_handle) == 1)
+						{
+							block_irq = false;
+						}
+						average_clock.add_sample((end - clock_start).count() >> 18);  // NOLINT(clang-diagnostic-shorten-64-to-32, bugprone-narrowing-conversions, cppcoreguidelines-narrowing-conversions)
 					}
 				});
 		}
@@ -175,11 +193,14 @@ namespace RV32IM
 		write_back = make_unique<Stage::WriteBack>(this);
 		register_file = make_unique<RegisterFile>();
 		branch = make_unique<BranchPrediction>(memory_size);
+		video_interface = make_unique<VideoInterface>(memory, video_width, video_height);
+		timer_counter = 0;
+		block_irq = false;
 	}
 
 	void Core::notify_keypress(const char input)
     {
-		get_irq_free();
+		//get_irq_free();
         memory->write_byte(keyboard_in, input);
         memory->write_byte(irq_vector, KEYBOARD);
         interrupt();
@@ -187,7 +208,7 @@ namespace RV32IM
 
 	void Core::notify_uart_keypress(const char input)
 	{
-		get_irq_free();
+		//get_irq_free();
         memory->write_byte(uart_rx, input);
         memory->write_byte(irq_vector, UART_RX);
         interrupt();
@@ -195,7 +216,7 @@ namespace RV32IM
 
 	void Core::notify_timer()
 	{
-		get_irq_free();
+		//get_irq_free();
 		memory->write_byte(irq_vector, TIMER);
 		interrupt();
 	}
@@ -203,6 +224,11 @@ namespace RV32IM
 	unsigned char Core::get_uart() const
 	{
         return memory->read_byte(uart_tx);
+	}
+
+	bool Core::is_clock_running() const
+	{
+		return !halt_clock;
 	}
 
 	unsigned_data Core::get_current_address() const
@@ -217,16 +243,26 @@ namespace RV32IM
 
 	int Core::get_average_clock_time() const
 	{
-		return average_clock_time;
+		return average_clock.get_average();
+	}
+
+	int Core::get_average_processing_time() const
+	{
+		return average_processing.get_average();
+	}
+
+	bool Core::get_irq() const
+	{
+		return block_irq;
 	}
 
 	void Core::interrupt()
 	{
-        if (memory->read_byte(irq_handle) == 1)
-        {
-            block_irq = false;
-            memory->write_byte(irq_handle, 0);
-        }
+		if (memory->read_byte(irq_handle) == 1)
+		{
+			block_irq = false;
+			memory->write_byte(irq_handle, 0);
+		}
         if (memory->read_byte(irq_en) == 1 && !block_irq)
         {
             block_irq = true;

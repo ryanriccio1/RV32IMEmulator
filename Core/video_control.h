@@ -30,7 +30,6 @@ namespace RV32IM
 		shared_ptr<uint8_t[]> video_memory;
 		vector<vector<uint32_t>> temp_buffer;
 
-
 		const unsigned_data video_width;
 		const unsigned_data video_height;
 

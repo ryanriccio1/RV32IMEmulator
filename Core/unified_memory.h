@@ -28,11 +28,12 @@ namespace RV32IM
 
 	private:
 		shared_ptr<uint8_t[]> memory;
+		size_t memory_size;
 	};
 
 	inline UnifiedMemory::UnifiedMemory() : UnifiedMemory(0x100000)	{}
 
-	inline UnifiedMemory::UnifiedMemory(const size_t& memory_size) : memory(new uint8_t[memory_size])
+	inline UnifiedMemory::UnifiedMemory(const size_t& memory_size) : memory(new uint8_t[memory_size]), memory_size(memory_size)
 	{
 		memset(memory.get(), 0, sizeof(uint8_t) * memory_size);
 	}
@@ -47,33 +48,33 @@ namespace RV32IM
 		return memory;
 	}
 
-	inline uint32_t UnifiedMemory::read_word(uint32_t address) const
+	inline uint32_t UnifiedMemory::read_word(const uint32_t address) const
 	{
-		return *(reinterpret_cast<uint32_t*>(memory.get() + (address & (0x100000 - 1))));
+		return *(reinterpret_cast<uint32_t*>(memory.get() + (address & (memory_size - 1))));
 	}
 
-	inline uint16_t UnifiedMemory::read_half_word(uint32_t address) const
+	inline uint16_t UnifiedMemory::read_half_word(const uint32_t address) const
 	{
-		return *(reinterpret_cast<uint16_t*>(memory.get() + (address & (0x100000 - 1))));
+		return *(reinterpret_cast<uint16_t*>(memory.get() + (address & (memory_size - 1))));
 	}
 
-	inline uint8_t UnifiedMemory::read_byte(uint32_t address) const
+	inline uint8_t UnifiedMemory::read_byte(const uint32_t address) const
 	{
-		return memory[(address & (0x100000 - 1))];
+		return memory[(address & (memory_size - 1))];
 	}
 
-	inline void UnifiedMemory::write_word(uint32_t address, uint32_t data) const
+	inline void UnifiedMemory::write_word(const uint32_t address, const uint32_t data) const
 	{
-		*(reinterpret_cast<uint32_t*>(memory.get() + (address & (0x100000 - 1)))) = data;
+		*(reinterpret_cast<uint32_t*>(memory.get() + (address & (memory_size - 1)))) = data;
 	}
 
-	inline void UnifiedMemory::write_half_word(uint32_t address, uint16_t data) const
+	inline void UnifiedMemory::write_half_word(const uint32_t address, const uint16_t data) const
 	{
-		*(reinterpret_cast<uint16_t*>(memory.get() + (address & (0x100000 - 1)))) = data;
+		*(reinterpret_cast<uint16_t*>(memory.get() + (address & (memory_size - 1)))) = data;
 	}
 
-	inline void UnifiedMemory::write_byte(uint32_t address, uint8_t data) const
+	inline void UnifiedMemory::write_byte(const uint32_t address, const uint8_t data) const
 	{
-		memory[(address & (0x100000 - 1))] = data;
+		memory[(address & (memory_size - 1))] = data;
 	}
 }

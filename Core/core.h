@@ -30,18 +30,18 @@ namespace RV32IM
 		friend class Stage::WriteBack;
 
 		Core();
-		Core(size_t memory_size);
-		Core(size_t memory_size, const int time_per_clock, const unsigned_data video_width, const unsigned_data video_height);
+		explicit Core(size_t memory_size);
+		Core(size_t memory_size, int time_per_clock, int video_width, int video_height);
 		~Core();
 
 		void load_memory_contents(const shared_ptr<uint8_t[]>& new_memory);
-		void set_desired_clock_time(const int time_per_clock);
+		void set_desired_clock_time(int time_per_clock);
 
-		shared_ptr<uint8_t[]>& get_memory_ptr() const;
-		shared_ptr<uint8_t[]>& get_video_memory() const;
-		size_t get_memory_size() const;
-		size_t get_video_width() const;
-		size_t get_video_height() const;
+		[[nodiscard]] shared_ptr<uint8_t[]>& get_memory_ptr() const;
+		[[nodiscard]] shared_ptr<uint8_t[]>& get_video_memory() const;
+		[[nodiscard]] size_t get_memory_size() const;
+		[[nodiscard]] int get_video_width() const;
+		[[nodiscard]] int get_video_height() const;
 
 		void start_clock();
 		void stop_clock();
@@ -51,11 +51,14 @@ namespace RV32IM
 		void notify_keypress(char input);
 		void notify_uart_keypress(char input);
 		void notify_timer();
-		unsigned char get_uart() const;
+		[[nodiscard]] unsigned char get_uart() const;
 
-		unsigned_data get_current_address() const;
-		array<unsigned_data, RegisterFile::NUM_REGISTERS>& get_registers() const;
-		int get_average_clock_time() const;
+		[[nodiscard]] bool is_clock_running() const;
+		[[nodiscard]] unsigned_data get_current_address() const;
+		[[nodiscard]] array<unsigned_data, RegisterFile::NUM_REGISTERS>& get_registers() const;
+		[[nodiscard]] int get_average_clock_time() const;
+		[[nodiscard]] int get_average_processing_time() const;
+		[[nodiscard]] bool get_irq() const;
 
 	private:
 		void interrupt();
@@ -73,17 +76,18 @@ namespace RV32IM
 		unique_ptr<BranchPrediction> branch;
 
 		unique_ptr<VideoInterface> video_interface;
-		size_t video_width;
-		size_t video_height;
+		int video_width;
+		int video_height;
 		size_t memory_size;
 
 		bool block_irq;
 
-		MovingAverage<int, 32> moving_average;
-		chrono::time_point<chrono::steady_clock> start;
+		MovingAverage<int, 32> average_clock;
+		MovingAverage<int, 32> average_processing;
+		chrono::time_point<chrono::steady_clock> clock_start;
+		chrono::time_point<chrono::steady_clock> processing_start;
 		chrono::time_point<chrono::steady_clock> end;
 		int desired_clock_time;
-		int average_clock_time;
 
 		thread clock_thread;
 		bool halt_clock;
