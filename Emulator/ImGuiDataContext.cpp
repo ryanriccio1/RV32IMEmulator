@@ -286,10 +286,15 @@ void ImGuiDataContext::show_window_registers()
 
 void ImGuiDataContext::show_window_memory()
 {
-    ImGui::Begin("Memory", nullptr, im_window_flags);
+    static MemoryEditor memory_editor;
+    memory_editor.Cols = 8;
+    if (core_clock_running) memory_editor.ReadOnly = true;
+    else memory_editor.ReadOnly = false;
+    //ImGui::Begin("Memory", nullptr, im_window_flags);
     if (ImGui::IsWindowFocused())
         current_window = CurrentWindow::Memory;
-    ImGui::End();
+    memory_editor.DrawWindow("Memory", core->get_memory_ptr().get(), core->get_memory_size());
+    //ImGui::End();
 }
 
 void ImGuiDataContext::show_menu_bar()

@@ -106,7 +106,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>..\ImGuiFileDialog;..\SDL\include;..\imgui;..\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\ImGuiFileDialog;..\SDL\include;..\imgui;..\imgui\backends;..\imgui_club\imgui_memory_editor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
@@ -127,7 +127,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>..\ImGuiFileDialog;..\SDL\include;..\imgui;..\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\ImGuiFileDialog;..\SDL\include;..\imgui;..\imgui\backends;..\imgui_club\imgui_memory_editor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -162,6 +162,7 @@
     <ClInclude Include="..\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\imgui\imstb_textedit.h" />
     <ClInclude Include="..\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\imgui_club\imgui_memory_editor\imgui_memory_editor.h" />
     <ClInclude Include="..\SDL\include\SDL3\SDL.h" />
     <ClInclude Include="..\SDL\include\SDL3\SDL_assert.h" />
     <ClInclude Include="..\SDL\include\SDL3\SDL_atomic.h" />
