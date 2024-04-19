@@ -6,6 +6,7 @@
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlrenderer3.h>
+#include <imgui_stdlib.h>
 #include <imgui_memory_editor.h>
 
 #include <SDL3/SDL.h>
@@ -30,6 +31,7 @@ public:
 	virtual void render();
 	void update_dpi();
 	SDL_WindowID get_window_id() const;
+	CurrentWindow get_current_window() const;
 
 private:
 	SDL_Window* window;
@@ -48,8 +50,8 @@ private:
 	shared_ptr<RV32IM::Core> core;
 	bool core_clock_running;
 
-	void read_file_to_core(const string& filePathName) const;
-	void set_next_window_size(float width, float height, float pos_x, float pos_y) const;
+	void read_file_to_core(const string& file_path_name) const;
+	void set_next_window_size(float width, float height, float pos_x, float pos_y, bool end=false) const;
 
 	void show_window_emulator();
 	void show_window_console();

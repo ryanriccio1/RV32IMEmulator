@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <thread>
+#include <string>
 
 #include "branch.h"
 #include "decode.h"
@@ -45,13 +46,12 @@ namespace RV32IM
 
 		void start_clock();
 		void stop_clock();
-		void step_clock() const;
+		void step_clock();
 		void reset();
 
-		void notify_keypress(char input);
-		void notify_uart_keypress(char input);
+		void notify_keypress(unsigned char input);
+		void notify_uart_keypress(unsigned char input);
 		void notify_timer();
-		[[nodiscard]] unsigned char get_uart() const;
 
 		[[nodiscard]] bool is_clock_running() const;
 		[[nodiscard]] unsigned_data get_current_address() const;
@@ -59,11 +59,14 @@ namespace RV32IM
 		[[nodiscard]] int get_average_clock_time() const;
 		[[nodiscard]] int get_average_processing_time() const;
 		[[nodiscard]] bool get_irq() const;
+		[[nodiscard]] string get_uart_data() const;
 
 	private:
 		void interrupt();
 		void clock() const;
 		void get_irq_free() const;
+		void start_uart_tx();
+		void stop_uart_tx();
 
 		unique_ptr<Stage::Fetch> fetch;
 		unique_ptr<Stage::Decode> decode;
@@ -94,7 +97,11 @@ namespace RV32IM
 
 		uint8_t timer_counter;
 		thread counter_thread;
-		bool stop_counter;
+		bool halt_counter;
+
+		string uart_data;
+		thread uart_tx_thread;
+		bool halt_uart;
 	};
 
 	

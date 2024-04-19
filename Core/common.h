@@ -24,6 +24,7 @@ namespace RV32IM
 	static constexpr unsigned_data irq_en = 0xFFFF5;
 	static constexpr unsigned_data irq_handle = 0xFFFF6;
 	static constexpr unsigned_data irq_vector = 0xFFFF7;
+	static constexpr unsigned_data data_ready = 0xFFFF8;
 
 	enum Opcodes
 	{

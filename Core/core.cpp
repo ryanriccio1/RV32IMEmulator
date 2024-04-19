@@ -28,7 +28,8 @@ namespace RV32IM
 		desired_clock_time(time_per_clock),
 		halt_clock(true),
 		timer_counter(0),
-		stop_counter(true)
+		halt_counter(true),
+		halt_uart(true)
 	{
 	}
 
@@ -108,16 +109,16 @@ namespace RV32IM
 
 	void Core::start_clock()
 	{
-		if (stop_counter && halt_clock)
+		if (halt_counter && halt_clock)
 		{
-			stop_counter = false;
+			halt_counter = false;
 			halt_clock = false;
 
 			video_interface->start_drawing();
 
 			counter_thread = thread([this]()
 				{
-					while (!stop_counter)
+					while (!halt_counter)
 					{
 						this_thread::sleep_for(chrono::milliseconds(1));
 						timer_counter++;
@@ -154,32 +155,38 @@ namespace RV32IM
 						average_clock.add_sample((end - clock_start).count() >> 18);  // NOLINT(clang-diagnostic-shorten-64-to-32, bugprone-narrowing-conversions, cppcoreguidelines-narrowing-conversions)
 					}
 				});
+
+			start_uart_tx();
 		}
 	}
 
 	void Core::stop_clock()
 	{
-		if (!stop_counter && !halt_clock)
+		if (!halt_counter && !halt_clock)
 		{
 			video_interface->stop_drawing();
 
-			stop_counter = true;
+			halt_counter = true;
 			if (counter_thread.joinable())
 				counter_thread.join();
 
 			halt_clock = true;
 			if (clock_thread.joinable())
 				clock_thread.join();
+
+			stop_uart_tx();
 		}
 	}
 
-	void Core::step_clock() const
+	void Core::step_clock()
 	{
-		if (stop_counter && halt_clock)
+		if (halt_counter && halt_clock)
 		{
 			clock();
 			video_interface->start_drawing();
 			video_interface->stop_drawing();
+			start_uart_tx();
+			stop_uart_tx();
 		}
 	}
 
@@ -196,19 +203,65 @@ namespace RV32IM
 		video_interface = make_unique<VideoInterface>(memory, video_width, video_height);
 		timer_counter = 0;
 		block_irq = false;
+		uart_data = "";
 	}
 
-	void Core::notify_keypress(const char input)
+	void Core::start_uart_tx()
+	{
+		halt_uart = false;
+		uart_tx_thread = thread([this]()
+			{
+				while (!halt_uart)
+				{
+					if (memory->read_byte(data_ready) == 1)
+					{
+						size_t pos;
+						const auto tx_data = static_cast<char>(memory->read_byte(uart_tx));
+						switch (tx_data)
+						{
+						case 2:
+							uart_data = "";
+							break;
+						case '\r':
+							pos = uart_data.rfind('\n');
+
+							// If the character is found, create a substring excluding the trailing characters
+							if (pos != std::string::npos) {
+								uart_data = uart_data.substr(0, pos + 1);
+							}
+							else
+							{
+								uart_data = "";
+							}
+							break;
+						default:
+							uart_data += tx_data;
+							break;
+						}
+						memory->write_byte(data_ready, 0);
+					}
+				}
+			});
+	}
+
+	void Core::stop_uart_tx()
+	{
+		halt_uart = true;
+		if (uart_tx_thread.joinable())
+			uart_tx_thread.join();
+	}
+
+	void Core::notify_keypress(const unsigned char input)
     {
-		//get_irq_free();
+		get_irq_free();
         memory->write_byte(keyboard_in, input);
         memory->write_byte(irq_vector, KEYBOARD);
         interrupt();
     }
 
-	void Core::notify_uart_keypress(const char input)
+	void Core::notify_uart_keypress(const unsigned char input)
 	{
-		//get_irq_free();
+		get_irq_free();
         memory->write_byte(uart_rx, input);
         memory->write_byte(irq_vector, UART_RX);
         interrupt();
@@ -216,14 +269,9 @@ namespace RV32IM
 
 	void Core::notify_timer()
 	{
-		//get_irq_free();
+		get_irq_free();
 		memory->write_byte(irq_vector, TIMER);
 		interrupt();
-	}
-
-	unsigned char Core::get_uart() const
-	{
-        return memory->read_byte(uart_tx);
 	}
 
 	bool Core::is_clock_running() const
@@ -254,6 +302,11 @@ namespace RV32IM
 	bool Core::get_irq() const
 	{
 		return block_irq;
+	}
+
+	string Core::get_uart_data() const
+	{
+		return uart_data;
 	}
 
 	void Core::interrupt()

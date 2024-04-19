@@ -100,19 +100,19 @@ void ImGuiDataContext::update()
     show_menu_bar();
 
     // emulator
-    set_next_window_size(75, 75, 0, 0);
+    set_next_window_size(70, 75, 0, 0);
     show_window_emulator();
 
     // console
-    set_next_window_size(75, 25, 0, 75);
+    set_next_window_size(70, 25, 0, 75, true);
     show_window_console();
 
     // registers
-    set_next_window_size(25, 50, 75, 0);
+    set_next_window_size(30, 45, 70, 0);
     show_window_registers();
 
     // memory
-    set_next_window_size(25, 50, 75, 50);
+    set_next_window_size(30, 55, 70, 45, true);
     show_window_memory();
 
     // file dialog
@@ -152,12 +152,17 @@ SDL_WindowID ImGuiDataContext::get_window_id() const
     return SDL_GetWindowID(window);
 }
 
-void ImGuiDataContext::read_file_to_core(const string& filePathName) const
+CurrentWindow ImGuiDataContext::get_current_window() const
+{
+    return current_window;
+}
+
+void ImGuiDataContext::read_file_to_core(const string& file_path_name) const
 {
     // create memory for file contents
 	const auto file_contents = shared_ptr<uint8_t[]>(new uint8_t[core->get_memory_size()]);
 
-	ifstream file(filePathName, std::ios::binary);
+	ifstream file(file_path_name, std::ios::binary);
     file.seekg(0, std::ios::end);
     const streamsize size = file.tellg();
     file.seekg(0, std::ios::beg);
@@ -171,11 +176,21 @@ void ImGuiDataContext::read_file_to_core(const string& filePathName) const
     core->load_memory_contents(file_contents);
 }
 
-void ImGuiDataContext::set_next_window_size(const float width, const float height, const float pos_x, const float pos_y) const
+void ImGuiDataContext::set_next_window_size(const float width, const float height, const float pos_x, const float pos_y, const bool end) const
 {
     // set values for ImGui internal window based on percentages and DPI
-    const auto window_size = ImVec2(static_cast<float>(base_width) * (width / 100.0f) * dpi_scale, 
-									static_cast<float>(base_height) * (height / 100.0f) * dpi_scale);
+    ImVec2 window_size;
+    if (end)
+    {
+        window_size = ImVec2(static_cast<float>(base_width) * (width / 100.0f) * dpi_scale,
+							 static_cast<float>(base_height) * (height / 100.0f) * dpi_scale - ImGui::GetFrameHeight());
+    }
+    else
+    {
+        window_size = ImVec2(static_cast<float>(base_width) * (width / 100.0f) * dpi_scale,
+							 static_cast<float>(base_height) * (height / 100.0f) * dpi_scale);
+    }
+    
 
     ImGui::SetNextWindowSize(window_size);
     ImGui::SetNextWindowPos(ImVec2(pos_x / 100.0f * dpi_scale * static_cast<float>(base_width),
@@ -205,8 +220,36 @@ void ImGuiDataContext::show_window_console()
     if (ImGui::IsWindowFocused())
         current_window = CurrentWindow::Console;
 
-    ImGui::Text("%.1f FPS (%.2f ms/frame) | %d (%d) ns/clock (%.1f MHz)", io.Framerate, 1000.0f / io.Framerate, core->get_average_clock_time(), core->get_average_processing_time(), 1000.0f / static_cast<float>(core->get_average_clock_time()));
-	
+	ImGui::Text("%.1f FPS (%.2f ms/frame) | %d (%d) ns/clock (%.1f MHz)", io.Framerate, 1000.0f / io.Framerate, core->get_average_clock_time(), core->get_average_processing_time(), 1000.0f / static_cast<float>(core->get_average_clock_time()));
+    ImGui::Separator();
+
+	/*static const float footerHeightToReserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+    ImGui::BeginChild("ScrollRegion##", ImVec2(0, -footerHeightToReserve), false, 0);*/
+    ImGui::PushTextWrapPos();
+
+	ImGui::TextUnformatted(core->get_uart_data().c_str());
+   
+    ImGui::PopTextWrapPos();
+    //ImGui::EndChild();
+
+    // Auto-scroll logs.
+    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+        ImGui::SetScrollHereY(1.0f);
+
+    //ImGui::Separator();
+    //static string uart_input;
+
+    //ImGui::PushItemWidth(-1);
+    ///*if(*/ImGui::InputText("##", &uart_input);
+    /*{
+        for (const auto character : uart_input)
+        {
+            core->notify_uart_keypress(character);
+        }
+        strcpy_s(uart_input, 1024, "");
+    }
+    ImGui::PopItemWidth();
+    */
     ImGui::End();
 }
 
@@ -250,7 +293,7 @@ void ImGuiDataContext::show_window_registers()
         // setup table columns/headers
         constexpr ImGuiTableColumnFlags column_flags = ImGuiTableColumnFlags_WidthFixed;
         ImGui::TableSetupColumn("Register", column_flags, 70.0f * dpi_scale);
-        ImGui::TableSetupColumn("Value", column_flags, 200.0f * dpi_scale);
+        ImGui::TableSetupColumn("Value", column_flags, 300.0f * dpi_scale);
         ImGui::TableHeadersRow();
 
     	if (core_clock_running) ImGui::BeginDisabled();
@@ -288,12 +331,17 @@ void ImGuiDataContext::show_window_memory()
 {
     static MemoryEditor memory_editor;
     memory_editor.Cols = 8;
-    if (core_clock_running) memory_editor.ReadOnly = true;
-    else memory_editor.ReadOnly = false;
-    //ImGui::Begin("Memory", nullptr, im_window_flags);
-    if (ImGui::IsWindowFocused())
+    
+
+    if (core_clock_running) 
+        memory_editor.ReadOnly = true;
+    else 
+        memory_editor.ReadOnly = false;
+
+	if (ImGui::IsWindowFocused())
         current_window = CurrentWindow::Memory;
-    memory_editor.DrawWindow("Memory", core->get_memory_ptr().get(), core->get_memory_size());
+
+	memory_editor.DrawWindow("Memory", core->get_memory_ptr().get(), core->get_memory_size(), im_window_flags | ImGuiWindowFlags_NoScrollbar);
     //ImGui::End();
 }
 

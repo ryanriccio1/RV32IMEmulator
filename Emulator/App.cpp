@@ -15,7 +15,58 @@
 
 using namespace std;
 
+unordered_map<char, char> shifted_num_row = {
+    {'`', '~'},
+    {'1', '!'},
+    {'2', '@'},
+	{'3', '#'},
+	{'4', '$'},
+	{'5', '%'},
+	{'6', '^'},
+	{'7', '&'},
+	{'8', '*'},
+	{'9', '('},
+	{'0', ')'},
+	{'-', '_'},
+	{'=', '+'},
+	{'[', '{'},
+	{']', '}'},
+	{'\\', '|'},
+	{';', ':'},
+	{'\'', '"'},
+	{',', '<'},
+	{'.', '>'},
+	{'/', '?'}
+};
 
+unsigned char calculate_character(const SDL_Event &event)
+{
+    static bool shift_pressed;
+    static bool ctrl_pressed;
+    static bool alt_pressed;
+
+    shift_pressed = (event.key.keysym.mod & SDL_KMOD_SHIFT) != 0;
+    ctrl_pressed = (event.key.keysym.mod & SDL_KMOD_CTRL) != 0;
+    alt_pressed = (event.key.keysym.mod & SDL_KMOD_ALT) != 0;
+
+
+    const auto test_keycode = static_cast<unsigned char>(SDL_SCANCODE_TO_KEYCODE(event.key.keysym.scancode));
+    if (test_keycode <= 127)
+    {
+        if (shift_pressed)
+        {
+            if (test_keycode >= 'a' && test_keycode <= 'z')
+                return static_cast<unsigned char>(toupper(test_keycode));
+
+            if (test_keycode >= '!' && test_keycode <= '@' ||
+                test_keycode >= '[' && test_keycode <= '`' ||
+                test_keycode >= '{' && test_keycode <= '~')
+                return shifted_num_row[test_keycode];
+        }
+    	return test_keycode;
+    }
+    return 255;
+}
 // Main code
 int main()
 {
@@ -55,7 +106,23 @@ int main()
             if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == app_context->get_window_id())
                 done = true;
             if (event.type == SDL_EVENT_KEY_DOWN)
-                core->notify_keypress('A');
+            {
+	            const auto input_char = calculate_character(event);
+                if (input_char != 255)
+                {
+                    switch (app_context->get_current_window())
+                    {
+                    case CurrentWindow::Emulator:
+                        core->notify_keypress(input_char);
+                        break;
+                    case CurrentWindow::Console:
+                        core->notify_uart_keypress(input_char);
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
             //if (event.type == SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED)
             //    app_context->UpdateDPI();
         }

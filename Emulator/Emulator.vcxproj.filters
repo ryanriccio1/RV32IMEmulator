@@ -60,6 +60,9 @@
     <ClCompile Include="..\ImGuiFileDialog\ImGuiFileDialog.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="..\imgui\misc\cpp\imgui_stdlib.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\imgui\imconfig.h">
@@ -339,6 +342,9 @@
       <Filter>Header Files\imgui</Filter>
     </ClInclude>
     <ClInclude Include="..\imgui_club\imgui_memory_editor\imgui_memory_editor.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\imgui\misc\cpp\imgui_stdlib.h">
       <Filter>Header Files\imgui</Filter>
     </ClInclude>
   </ItemGroup>
