@@ -15,7 +15,7 @@
 
 using namespace std;
 
-unordered_map<char, char> shifted_num_row = {
+unordered_map<char, char> shifted_key_map = {
     {'`', '~'},
     {'1', '!'},
     {'2', '@'},
@@ -39,15 +39,21 @@ unordered_map<char, char> shifted_num_row = {
 	{'/', '?'}
 };
 
+enum CoreOperation
+{
+	START = 128, STEP, STOP, RESET
+};
+
 unsigned char calculate_character(const SDL_Event &event)
 {
     static bool shift_pressed;
     static bool ctrl_pressed;
     static bool alt_pressed;
 
-    shift_pressed = (event.key.keysym.mod & SDL_KMOD_SHIFT) != 0;
-    ctrl_pressed = (event.key.keysym.mod & SDL_KMOD_CTRL) != 0;
-    alt_pressed = (event.key.keysym.mod & SDL_KMOD_ALT) != 0;
+    
+    shift_pressed = (SDL_GetModState() & SDL_KMOD_SHIFT) != 0;
+    ctrl_pressed = (SDL_GetModState() & SDL_KMOD_CTRL) != 0;
+    alt_pressed = (SDL_GetModState() & SDL_KMOD_ALT) != 0;
 
 
     const auto test_keycode = static_cast<unsigned char>(SDL_SCANCODE_TO_KEYCODE(event.key.keysym.scancode));
@@ -61,7 +67,18 @@ unsigned char calculate_character(const SDL_Event &event)
             if (test_keycode >= '!' && test_keycode <= '@' ||
                 test_keycode >= '[' && test_keycode <= '`' ||
                 test_keycode >= '{' && test_keycode <= '~')
-                return shifted_num_row[test_keycode];
+                return shifted_key_map[test_keycode];
+        }
+        if (ctrl_pressed)
+        {
+            if (test_keycode == 'k')
+                return START;
+            if (test_keycode == 'l')
+                return STEP;
+            if (test_keycode == 'j')
+                return STOP;
+            if (test_keycode == 'r')
+                return RESET;
         }
     	return test_keycode;
     }
@@ -108,9 +125,30 @@ int main()
             if (event.type == SDL_EVENT_KEY_DOWN)
             {
 	            const auto input_char = calculate_character(event);
-                if (input_char != 255)
+                switch (input_char)
                 {
-                    switch (app_context->get_current_window())
+                case START:
+                    if (!core->is_clock_running())
+                        core->start_clock();
+                    break;
+                case STEP:
+                    if (!core->is_clock_running())
+                        core->step_clock();
+                    break;
+                case STOP:
+                    if (core->is_clock_running())
+                        core->stop_clock();
+                    break;
+                case RESET:
+                    app_context->reset_to_file();
+                    break;
+                default:
+                    break;
+                }
+                if (input_char <= 127)
+                {
+                    switch (app_context->
+                        get_current_window())
                     {
                     case CurrentWindow::Emulator:
                         core->notify_keypress(input_char);

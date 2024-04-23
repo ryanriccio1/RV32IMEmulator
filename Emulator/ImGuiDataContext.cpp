@@ -157,8 +157,9 @@ CurrentWindow ImGuiDataContext::get_current_window() const
     return current_window;
 }
 
-void ImGuiDataContext::read_file_to_core(const string& file_path_name) const
+void ImGuiDataContext::read_file_to_core(const string& file_path_name)
 {
+    last_file_path = file_path_name;
     // create memory for file contents
 	const auto file_contents = shared_ptr<uint8_t[]>(new uint8_t[core->get_memory_size()]);
 
@@ -211,6 +212,52 @@ void ImGuiDataContext::show_window_emulator()
     
 	ImGui::SetCursorPosX((ImGui::GetWindowSize().x - image_size.x) * 0.5f);
     ImGui::Image(emulator_screen, image_size);
+
+    ImGui::SetCursorPosX((ImGui::GetWindowSize().x - image_size.x) * 0.5f);
+    ImGui::BeginChild("stuff");
+	if (core_clock_running) ImGui::BeginDisabled();
+    if(ImGui::Button("Start"))
+    {
+        core->start_clock();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Step"))
+    {
+        core->step_clock();
+    }
+    ImGui::SameLine();
+    if (core_clock_running) ImGui::EndDisabled();
+
+	if (!core_clock_running) ImGui::BeginDisabled();
+	if (ImGui::Button("Stop"))
+    {
+        core->stop_clock();
+    }
+    if (!core_clock_running) ImGui::EndDisabled();
+
+    ImGui::SameLine();
+    if (ImGui::Button("Reset"))
+        reset_to_file();
+
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(125 * dpi_scale);
+
+    static string clock_delay;
+    if (ImGui::InputTextWithHint("Desired Clock Length", "delay (ns)", &clock_delay, ImGuiInputTextFlags_EnterReturnsTrue))
+    {
+        try
+        {
+            core->set_desired_clock_time(stoi(clock_delay));
+        }
+        catch (std::invalid_argument const& ex)
+        {
+        }
+        catch (std::out_of_range const& ex)
+        {
+        }
+    }
+
+    ImGui::EndChild();
     ImGui::End();
 }
 
@@ -364,7 +411,7 @@ void ImGuiDataContext::show_menu_bar()
 void ImGuiDataContext::show_menu_bar_file()
 {
     ImGui::MenuItem("Emulator Options", nullptr, false, false);
-    if (ImGui::MenuItem("Open", "Ctrl+O"))
+    if (ImGui::MenuItem("Open"))
     {
         IGFD::FileDialogConfig config;
         config.path = ".";
@@ -375,7 +422,7 @@ void ImGuiDataContext::show_menu_bar_file()
     if (ImGui::MenuItem("Quit", "Alt+F4")) { quick_exit(0); }
 }
 
-void ImGuiDataContext::show_menu_bar_options() const
+void ImGuiDataContext::show_menu_bar_options()
 {
     ImGui::MenuItem("Actions", nullptr, false, false);
 
@@ -396,7 +443,8 @@ void ImGuiDataContext::show_menu_bar_options() const
         core->stop_clock();
     }
     if (!core_clock_running) ImGui::EndDisabled();
-
+    if (ImGui::MenuItem("Reset", "Ctrl+R"))
+        reset_to_file();
 }
 
 void ImGuiDataContext::show_dialog_open_file()
@@ -410,4 +458,12 @@ void ImGuiDataContext::show_dialog_open_file()
         }
         ImGuiFileDialog::Instance()->Close();
     }
+}
+
+void ImGuiDataContext::reset_to_file()
+{
+    if (!last_file_path.empty())
+        read_file_to_core(last_file_path);
+    else
+        core->reset();
 }

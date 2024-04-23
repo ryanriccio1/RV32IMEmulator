@@ -32,6 +32,7 @@ public:
 	void update_dpi();
 	SDL_WindowID get_window_id() const;
 	CurrentWindow get_current_window() const;
+	void reset_to_file();
 
 private:
 	SDL_Window* window;
@@ -44,13 +45,13 @@ private:
 	float dpi_scale;
 	float last_scale;
 	CurrentWindow current_window; 
-
+	string last_file_path;
 
 	SDL_Texture* emulator_screen;
 	shared_ptr<RV32IM::Core> core;
 	bool core_clock_running;
 
-	void read_file_to_core(const string& file_path_name) const;
+	void read_file_to_core(const string& file_path_name);
 	void set_next_window_size(float width, float height, float pos_x, float pos_y, bool end=false) const;
 
 	void show_window_emulator();
@@ -60,7 +61,7 @@ private:
 
 	void show_menu_bar();
 	void show_menu_bar_file();
-	void show_menu_bar_options() const;
+	void show_menu_bar_options();
 
 	void show_dialog_open_file();
 };
