@@ -34,3 +34,5 @@
 # Project Files
 *.vs*
 x64/
+
+packages/

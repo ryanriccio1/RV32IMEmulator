@@ -464,6 +464,4 @@ void ImGuiDataContext::reset_to_file()
 {
     if (!last_file_path.empty())
         read_file_to_core(last_file_path);
-    else
-        core->reset();
 }
