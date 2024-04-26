@@ -31,11 +31,11 @@ namespace RV32IM
 		friend class Stage::WriteBack;
 
 		Core();
-		explicit Core(size_t memory_size);
-		Core(size_t memory_size, int time_per_clock, int video_width, int video_height);
+		// explicit Core(size_t memory_size);
+		Core(int time_per_clock, int video_width, int video_height);
 		~Core();
 
-		void load_memory_contents(const shared_ptr<uint8_t[]>& new_memory);
+		void load_memory_contents(const shared_ptr<uint8_t[]>& new_memory, size_t new_memory_size);
 		void set_desired_clock_time(int time_per_clock);
 
 		[[nodiscard]] shared_ptr<uint8_t[]>& get_memory_ptr() const;

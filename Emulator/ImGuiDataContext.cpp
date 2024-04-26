@@ -160,21 +160,26 @@ CurrentWindow ImGuiDataContext::get_current_window() const
 void ImGuiDataContext::read_file_to_core(const string& file_path_name)
 {
     last_file_path = file_path_name;
-    // create memory for file contents
-	const auto file_contents = shared_ptr<uint8_t[]>(new uint8_t[core->get_memory_size()]);
 
 	ifstream file(file_path_name, std::ios::binary);
     file.seekg(0, std::ios::end);
     const streamsize size = file.tellg();
-    file.seekg(0, std::ios::beg);
+
+    file.seekg(0x30, std::ios::beg);
+    uint32_t memory_size;
+    file.read(reinterpret_cast<char*>(&memory_size), 4);
+
+    // create memory for file contents
+    const auto file_contents = shared_ptr<uint8_t[]>(new uint8_t[memory_size]);
 
     // read file contents into memory
-    memset(file_contents.get(), 0, core->get_memory_size());
-    file.read(reinterpret_cast<char*>(file_contents.get()), min(size, static_cast<streamsize>(core->get_memory_size())));
+    memset(file_contents.get(), 0, memory_size);
+    file.seekg(0, std::ios::beg);
+    file.read(reinterpret_cast<char*>(file_contents.get()), min(static_cast<uint32_t>(size), memory_size));
     file.close();
 
     // load to risc core
-    core->load_memory_contents(file_contents);
+    core->load_memory_contents(file_contents, memory_size);
 }
 
 void ImGuiDataContext::set_next_window_size(const float width, const float height, const float pos_x, const float pos_y, const bool end) const

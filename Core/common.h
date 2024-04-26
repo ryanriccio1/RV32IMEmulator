@@ -11,20 +11,35 @@ namespace RV32IM
 	using signed_data = int32_t;
 	using inst_data = uint32_t;
 
-	static constexpr unsigned_data vga_mode = 0xFFF00;
-	static constexpr unsigned_data vga_mem_ptr = 0xFFF04;
-	static constexpr unsigned_data col_mem_ptr = 0xFFF08;
-	static constexpr unsigned_data chr_mem_ptr = 0xFFF0C;
+	inline unsigned_data vga_mode = 0xFFF00;
+	inline unsigned_data vga_mem_ptr = 0xFFF04;
+	inline unsigned_data col_mem_ptr = 0xFFF08;
+	inline unsigned_data chr_mem_ptr = 0xFFF0C;
 
-	static constexpr unsigned_data irq_mask = 0xFFFF0;
-	static constexpr unsigned_data timer_in = 0xFFFF1;
-	static constexpr unsigned_data keyboard_in = 0xFFFF2;
-	static constexpr unsigned_data uart_tx = 0xFFFF3;
-	static constexpr unsigned_data uart_rx = 0xFFFF4;
-	static constexpr unsigned_data irq_en = 0xFFFF5;
-	static constexpr unsigned_data irq_handle = 0xFFFF6;
-	static constexpr unsigned_data irq_vector = 0xFFFF7;
-	static constexpr unsigned_data data_ready = 0xFFFF8;
+	inline unsigned_data irq_mask = 0xFFFF0;
+	inline unsigned_data timer_in = 0xFFFF1;
+	inline unsigned_data keyboard_in = 0xFFFF2;
+	inline unsigned_data uart_tx = 0xFFFF3;
+	inline unsigned_data uart_rx = 0xFFFF4;
+	inline unsigned_data irq_en = 0xFFFF5;
+	inline unsigned_data irq_handle = 0xFFFF6;
+	inline unsigned_data irq_vector = 0xFFFF7;
+	inline unsigned_data data_ready = 0xFFFF8;
+
+	static constexpr unsigned_data offset_vga_mode = 0x34;
+	static constexpr unsigned_data offset_vga_mem_ptr = 0x30;
+	static constexpr unsigned_data offset_col_mem_ptr = 0x2C;
+	static constexpr unsigned_data offset_chr_mem_ptr = 0x28;
+		    
+	static constexpr unsigned_data offset_irq_mask = 0x24;
+	static constexpr unsigned_data offset_timer_in = 0x20;
+	static constexpr unsigned_data offset_keyboard_in = 0x1C;
+	static constexpr unsigned_data offset_uart_tx = 0x18;
+	static constexpr unsigned_data offset_uart_rx = 0x14;
+	static constexpr unsigned_data offset_irq_en = 0x10;
+	static constexpr unsigned_data offset_irq_handle = 0x0C;
+	static constexpr unsigned_data offset_irq_vector = 0x08;
+	static constexpr unsigned_data offset_data_ready = 0x04;
 
 	enum Opcodes
 	{
@@ -129,7 +144,7 @@ namespace RV32IM
 		KEYBOARD = 1, UART_RX = 2, TIMER = 4
 	};
 
-	enum VideoModes
+	enum VideoMode
 	{
 		BITMAP, CHARACTER
 	};
@@ -139,4 +154,5 @@ namespace RV32IM
 	constexpr unsigned_data generate_bitmask(size_t bit_width);
 	unsigned_data mask_data(unsigned_data data, size_t low_bit, size_t high_bit);
 	unsigned_data sign_extend(unsigned_data data, size_t space);
+	void update_offsets(uint32_t memory_size);
 }

@@ -41,7 +41,7 @@ unordered_map<char, char> shifted_key_map = {
 
 enum CoreOperation
 {
-	START = 128, STEP, STOP, RESET
+	UP = 128, DOWN, LEFT, RIGHT, START, STEP, STOP, RESET
 };
 
 unsigned char calculate_character(const SDL_Event &event)
@@ -49,14 +49,14 @@ unsigned char calculate_character(const SDL_Event &event)
     static bool shift_pressed;
     static bool ctrl_pressed;
     static bool alt_pressed;
-
     
     shift_pressed = (SDL_GetModState() & SDL_KMOD_SHIFT) != 0;
     ctrl_pressed = (SDL_GetModState() & SDL_KMOD_CTRL) != 0;
     alt_pressed = (SDL_GetModState() & SDL_KMOD_ALT) != 0;
 
 
-    const auto test_keycode = static_cast<unsigned char>(SDL_SCANCODE_TO_KEYCODE(event.key.keysym.scancode));
+    const auto test_keycode = event.key.keysym.sym;
+    
     if (test_keycode <= 127)
     {
         if (shift_pressed)
@@ -80,9 +80,25 @@ unsigned char calculate_character(const SDL_Event &event)
             if (test_keycode == 'r')
                 return RESET;
         }
+        if (test_keycode == '\r')
+            return  '\n';
+
     	return test_keycode;
     }
-    return 255;
+
+    switch (event.key.keysym.scancode)
+    {
+    case SDL_SCANCODE_UP:
+        return UP;
+    case SDL_SCANCODE_DOWN:
+        return DOWN;
+    case SDL_SCANCODE_LEFT:
+        return LEFT;
+    case SDL_SCANCODE_RIGHT:
+        return RIGHT;
+    default:
+        return 255;
+    }
 }
 // Main code
 int main()
@@ -90,12 +106,11 @@ int main()
 	constexpr size_t window_width = 1280;
 	constexpr size_t window_height = 720;
 
-    constexpr size_t memory_size = 0x100000;
     constexpr int time_per_clock = 0;
     constexpr size_t emulator_screen_width = 320;
     constexpr size_t emulator_screen_height = 240;
 
-    auto core = make_shared<RV32IM::Core>(memory_size, time_per_clock, emulator_screen_width, emulator_screen_height);
+    auto core = make_shared<RV32IM::Core>(time_per_clock, emulator_screen_width, emulator_screen_height);
    
 	// Setup SDL
     Uint32 SDL_flags = SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMEPAD;
@@ -145,7 +160,7 @@ int main()
                 default:
                     break;
                 }
-                if (input_char <= 127)
+                if (input_char <= RIGHT)
                 {
                     switch (app_context->
                         get_current_window())

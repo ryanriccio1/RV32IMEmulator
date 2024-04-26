@@ -77,10 +77,10 @@ namespace RV32IM
 		{
 			for (unsigned_data x{ 0 }; x < video_width; x+=8)
 			{
-				const unsigned_data select_character = memory->read_word(video_mem_address + (x >> 1) + ((y >> 3) * (video_width >> 1)));
+				const unsigned_data select_character = memory->read_byte(video_mem_address + (x >>3) + ((y >> 3) * (video_width >> 3)));
 				const unsigned_data foreground = memory->read_word(color_mem_address + x + video_width * (y >> 3));
 				const unsigned_data background = memory->read_word(color_mem_address + x + 4 + video_width * (y >> 3));
-				const uint8_t character_mask = memory->read_byte(char_mem_address + select_character * 8 + (7 - (y % 8)));
+				const uint8_t character_mask = memory->read_byte(char_mem_address + select_character * 8 + y % 8);
 
 				for (unsigned_data i{ 0 }; i < 8; i++)
 					temp_buffer[y][i + x] = ((character_mask >> (7 - i)) & 0b00000001) == 1 ? background : foreground;

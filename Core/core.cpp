@@ -2,25 +2,25 @@
 
 namespace RV32IM
 {
-	Core::Core() : Core(0x100000)	{}
+	Core::Core() : Core(0, 320, 240)	{}
 
-	Core::Core(const size_t memory_size) : Core(memory_size, 0, 320, 240)
+	/*Core::Core(const size_t memory_size) : Core(memory_size, 0, 320, 240)
 	{
-	}
+	}*/
 
-	Core::Core(const size_t memory_size, const int time_per_clock, const int video_width, const int video_height) :
+	Core::Core(const int time_per_clock, const int video_width, const int video_height) :
 		fetch(new Stage::Fetch(this)),
 		decode(new Stage::Decode(this)),
 		execute(new Stage::Execute(this)),
 		memory_stage(new Stage::Memory(this)),
 		write_back(new Stage::WriteBack(this)),
 		register_file(new RegisterFile()),
-		memory(new UnifiedMemory(memory_size)),
-		branch(new BranchPrediction(memory_size)),
+		memory(new UnifiedMemory(0x100)),
+		branch(new BranchPrediction(0x100)),
 		video_interface(new VideoInterface(memory, video_width, video_height)),
 		video_width(video_width),
 		video_height(video_height),
-		memory_size(memory_size),
+		memory_size(0x100),
 		block_irq(false),
 		clock_start(),
 		processing_start(),
@@ -63,13 +63,16 @@ namespace RV32IM
 #endif
 	}
 
-	void Core::load_memory_contents(const shared_ptr<uint8_t[]>& new_memory)
+	void Core::load_memory_contents(const shared_ptr<uint8_t[]>& new_memory, const size_t new_memory_size)
 	{
 		bool restart_clock = false;
 		if (is_clock_running())
 			restart_clock = true;
 
 		stop_clock();
+		memory_size = new_memory_size;
+		update_offsets(memory_size);
+		memory = make_shared<UnifiedMemory>(memory_size);
         memory->load_memory_contents(new_memory);
 		reset();
 
@@ -123,7 +126,7 @@ namespace RV32IM
 						this_thread::sleep_for(chrono::milliseconds(1));
 						timer_counter++;
 						memory->write_byte(timer_in, timer_counter);
-						if (timer_counter == 255)
+						if (timer_counter % 16 == 0)
 							notify_timer();
 					}
 				});
@@ -233,6 +236,10 @@ namespace RV32IM
 							{
 								uart_data = "";
 							}
+							break;
+						case '\b':
+							if (uart_data.length() > 0)
+								uart_data.pop_back();
 							break;
 						default:
 							uart_data += tx_data;
