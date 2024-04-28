@@ -161,25 +161,27 @@ void ImGuiDataContext::read_file_to_core(const string& file_path_name)
 {
     last_file_path = file_path_name;
 
-	ifstream file(file_path_name, std::ios::binary);
-    file.seekg(0, std::ios::end);
-    const streamsize size = file.tellg();
+    if (ifstream file(file_path_name, std::ios::binary); file)
+    {
+        file.seekg(0, std::ios::end);
+        const streamsize size = file.tellg();
 
-    file.seekg(0x30, std::ios::beg);
-    uint32_t memory_size;
-    file.read(reinterpret_cast<char*>(&memory_size), 4);
+        file.seekg(0x30, std::ios::beg);
+        uint32_t memory_size;
+        file.read(reinterpret_cast<char*>(&memory_size), 4);
 
-    // create memory for file contents
-    const auto file_contents = shared_ptr<uint8_t[]>(new uint8_t[memory_size]);
+        // create memory for file contents
+        const auto file_contents = shared_ptr<uint8_t[]>(new uint8_t[memory_size]);
 
-    // read file contents into memory
-    memset(file_contents.get(), 0, memory_size);
-    file.seekg(0, std::ios::beg);
-    file.read(reinterpret_cast<char*>(file_contents.get()), min(static_cast<uint32_t>(size), memory_size));
-    file.close();
+        // read file contents into memory
+        memset(file_contents.get(), 0, memory_size);
+        file.seekg(0, std::ios::beg);
+        file.read(reinterpret_cast<char*>(file_contents.get()), min(static_cast<uint32_t>(size), memory_size));
+        file.close();
 
-    // load to risc core
-    core->load_memory_contents(file_contents, memory_size);
+        // load to risc core
+        core->load_memory_contents(file_contents, memory_size);
+    }
 }
 
 void ImGuiDataContext::set_next_window_size(const float width, const float height, const float pos_x, const float pos_y, const bool end) const
@@ -457,9 +459,9 @@ void ImGuiDataContext::show_dialog_open_file()
     set_next_window_size(80, 80, 10, 10);
     if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey", im_window_flags ^ ImGuiWindowFlags_NoBringToFrontOnFocus)) {
         if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
-            const string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            const string fileName = ImGuiFileDialog::Instance()->GetCurrentFileName();
             const string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-            read_file_to_core(filePath + IGFD::Utils::GetPathSeparator() + filePathName);
+            read_file_to_core(filePath + IGFD::Utils::GetPathSeparator() + fileName);
         }
         ImGuiFileDialog::Instance()->Close();
     }

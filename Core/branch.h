@@ -15,5 +15,6 @@ namespace RV32IM
 	private:
 		unique_ptr<uint8_t[]> branch_status_table;
 		unique_ptr<uint8_t[]> branch_history_table;
+		size_t memory_size;
 	};
 }

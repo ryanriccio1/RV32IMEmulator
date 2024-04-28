@@ -126,7 +126,7 @@ namespace RV32IM
 						this_thread::sleep_for(chrono::milliseconds(1));
 						timer_counter++;
 						memory->write_byte(timer_in, timer_counter);
-						if (timer_counter % 16 == 0)
+						if (timer_counter % 32 == 0)
 							notify_timer();
 					}
 				});

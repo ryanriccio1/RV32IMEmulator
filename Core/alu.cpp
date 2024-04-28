@@ -68,9 +68,6 @@ namespace RV32IM
 				return rs1 < rs2 ? branch : no_branch;
 			case BGEU:
 				return rs1 >= rs2 ? branch : no_branch;
-			case SLT:
-			case SLTU:
-				return 0xFFFFFFFF;
 			}
 		}
 		if (instruction.type == InstructionFormat::I)
@@ -134,12 +131,24 @@ namespace RV32IM
 			case MULHU:
 				return (static_cast<int64_t>(rs1) * static_cast<int64_t>(rs2)) >> 32;
 			case DIV:
+				if (rs2 == 0)
+					return -1;
+				if (static_cast<signed_data>(rs2) == -1 && static_cast<signed_data>(rs1) == INT32_MIN)
+					return INT32_MIN;
 				return static_cast<signed_data>(rs1) / static_cast<signed_data>(rs2);
 			case REM:
+				if (rs2 == 0)
+					return rs1;
+				if (static_cast<signed_data>(rs2) == -1 && static_cast<signed_data>(rs1) == INT32_MIN)
+					return 0;
 				return static_cast<signed_data>(rs1) % static_cast<signed_data>(rs2);
 			case DIVU:
+				if (rs2 == 0)
+					return -1;
 				return rs1 / rs2;
 			case REMU:
+				if (rs2 == 0)
+					return rs1;
 				return rs1 % rs2;
 			}
 		}
