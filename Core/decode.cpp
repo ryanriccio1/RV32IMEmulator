@@ -127,7 +127,7 @@ namespace RV32IM
 
 		void Decode::irq()
 		{
-			irq_counter = 10;
+			irq_counter = 5;
 			irq_return_address = reg_PC;
 		}
 

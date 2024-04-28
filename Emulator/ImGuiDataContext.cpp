@@ -1,5 +1,7 @@
 #include "ImGuiDataContext.h"
 
+#include "Icon.h"
+
 using namespace std;
 ImGuiDataContext::ImGuiDataContext(const string& window_name, const Uint32 SDL_flags, const Uint32 window_flags, const Uint32 renderer_flags,
     const ImGuiConfigFlags io_config_flags, const int base_width, const int base_height, const shared_ptr<RV32IM::Core>& core) :
@@ -32,6 +34,14 @@ ImGuiDataContext::ImGuiDataContext(const string& window_name, const Uint32 SDL_f
         SDL_Log("Error: SDL_CreateRenderer(): %s\n", SDL_GetError());
         throw SDLContextInitializationError();
     }
+
+    // set icon
+    auto surface = SDL_CreateSurface(64, 64, SDL_PIXELFORMAT_ARGB8888);
+    SDL_LockSurface(surface);
+    memcpy_s(surface->pixels, 64 * 64 * sizeof(uint32_t), icon, 64 * 64 * sizeof(uint32_t));
+    SDL_UnlockSurface(surface);
+    SDL_SetWindowIcon(window, surface);
+	SDL_DestroySurface(surface);
 
 
     // setup ImGui context
