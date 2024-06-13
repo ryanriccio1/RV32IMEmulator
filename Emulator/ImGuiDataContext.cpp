@@ -3,8 +3,8 @@
 #include "Icon.h"
 
 using namespace std;
-ImGuiDataContext::ImGuiDataContext(const string& window_name, const Uint32 SDL_flags, const Uint32 window_flags, const Uint32 renderer_flags,
-    const ImGuiConfigFlags io_config_flags, const int base_width, const int base_height, const shared_ptr<RV32IM::Core>& core) :
+ImGuiDataContext::ImGuiDataContext(const string& window_name, const Uint32 SDL_flags, const Uint32 window_flags, const ImGuiConfigFlags io_config_flags, 
+    const int base_width, const int base_height, const shared_ptr<RV32IM::Core>& core) :
 	io((ImGui::CreateContext(), ImGui::GetIO())),  // NOLINT(clang-diagnostic-comma)
 	style{ImGui::GetStyle()},
 	base_width{base_width},
@@ -28,7 +28,8 @@ ImGuiDataContext::ImGuiDataContext(const string& window_name, const Uint32 SDL_f
     }
 
     // Create SDL renderer
-    renderer = SDL_CreateRenderer(window, nullptr, renderer_flags);
+    renderer = SDL_CreateRenderer(window, nullptr);
+    SDL_SetRenderVSync(renderer, 1);
     if (renderer == nullptr)
     {
         SDL_Log("Error: SDL_CreateRenderer(): %s\n", SDL_GetError());
@@ -134,7 +135,7 @@ void ImGuiDataContext::render()
     // render data from ImGui to SDL
     ImGui::Render();
     SDL_RenderClear(renderer);
-    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData());
+    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
     SDL_RenderPresent(renderer);
 }
 

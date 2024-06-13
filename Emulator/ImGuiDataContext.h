@@ -7,7 +7,7 @@
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlrenderer3.h>
 #include <imgui_stdlib.h>
-#include <imgui_memory_editor.h>
+#include "imgui_memory_editor.h"
 
 #include <SDL3/SDL.h>
 
@@ -23,7 +23,7 @@ enum class CurrentWindow { Emulator, Console, Registers, Memory, None };
 class ImGuiDataContext
 {
 public:
-	ImGuiDataContext(const string& window_name, Uint32 SDL_flags, Uint32 window_flags, Uint32 renderer_flags, ImGuiConfigFlags io_config_flags, int base_width, int base_height, const shared_ptr<RV32IM::Core>& core);
+	ImGuiDataContext(const string& window_name, Uint32 SDL_flags, Uint32 window_flags, ImGuiConfigFlags io_config_flags, int base_width, int base_height, const shared_ptr<RV32IM::Core>& core);
 	virtual ~ImGuiDataContext();
 
 	virtual void new_frame();
